@@ -7,7 +7,7 @@ order: 4
 <!-- > Add Markdown syntax content to file `_tabs/about.md`{: .filepath } and it will show up on this page.
 {: .prompt-tip } -->
 
-Ahoy data voyagers!
+Ahoy data voyagers!..
 
 In the dynamic landscape of decision-making, I am driven by the unwavering belief that data is the key to unlocking profound insights. My inspiration flourishes in the vast realms of data, where the fusion of information and computational prowess creates a powerful tool for informed decision-making. I am captivated by the synergy of extensive data and advanced computing, propelling the creation of intelligent systems that not only complement but also exceed human cognition, minimizing errors along the way.
 
