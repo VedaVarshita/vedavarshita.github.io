@@ -11,7 +11,7 @@ order: 1
 
 _Drexel University_ Philadelphia, PA **Master of Science, Artificial Intelligence & Machine Learning** (CGPA: 3.9) Sep 2023 – June 2025
 
-**Coursework**: Data acquisition & preprocessing, Machine Learning, Natural Language Processing.
+**Coursework**: Intro to Cloud Computing, Data Analysis and Interpretation, Machine Learning.
 
 _Lovely Professional University_ Punjab, India **Bachelor of Technology, Electronics & Communication Engineering (Hons.)** July 2018 – May 2022 _Minor in Data Science_
 
@@ -19,39 +19,47 @@ _Lovely Professional University_ Punjab, India **Bachelor of Technology, Electro
 
 # Experience
 
-**Associate Software Engineer** _ - Location Intelligence R&D dept._**PRECISELY** Bangalore, India July 2022 – June 2023 
-- Optimization of Geocoded Master Location Data pipeline, a standardized dataset that contains detailed geographic and locational information. This involved implementing efficient algorithms to enhance the overall performance.
-- Coordinated with cross-functional teams to identify and resolve data quality issues by creation of World Fabric Data automation pipeline, leading to a 70% reduction in data processing time.
-- Automated quality assurance process, identifying potential discrepancies and rectifying issues within the ’Alternate Language Data’, resulting in a 36% improvement in accuracy.
+**AI/ML Research Assistant** _CODED Lab, Drexel University_ | Advisor: Dr. Jake Williams | PyTorch, LLM | Philadelphia, PA | July 2024 – present
+- Expanded a novel Bayesian inspired neural network initialization algorithm leveraging co-occurrence and Product Quantization, improving pre-gradient update accuracy from ≈10% (random) to 65–74% on CIFAR-10 and MNIST
+- Validated the approach through weight evolution analysis, showing 76% cosine similarity between initialized and fully trained kernels, demonstrating its effectiveness as an informative warm-start for neural networks
+- Integrated RLHF with 1.5B parameter Language Model via preference-based fine-tuning with DPO and adaptive training, improving performance by 17% and reducing perplexity from 31.64 to 25.42 on HHH dataset
 
-**Machine Learning Intern** _- Location Intelligence R&D dept._**PRECISELY** Bangalore, India Jan 2022 – June 2022 
-- Researched and executed a machine learning model using TensorFlow and Keras to de-duplicate addresses, resulting in reduction in duplicate entries.
-- Trained a Bi-LSTM model with ’GloVe’ word embedding to accurately identify and merge duplicate addresses.
-- Created a Master Location Data by de-duplicating over 1 million addresses, improving data integrity and reliability
-for future analysis.
+**Associate Software Engineer** _Location Intelligence R&D dept._ | **PRECISELY** | Python, SQL | Bangalore, India | July 2022 – June 2023 
+- Enhanced Geocoded Master Location Data pipeline, expanding coverage to Sweden and France while optimizing data processing for 1M+ geographic locations
+- Productionized World Fabric Data automation pipeline by integrating UPU postal data, reducing processing time by 67%, improving cross-country data consistency and reducing manual validation effort
+- Automated QA framework, streamlining test case execution, identifying potential discrepancies and rectifying issues within the Alternate Language Data over various countries, resulting in a 28% improvement in accuracy
 
-# Projects
-**Predictive Modeling of Daily Air Quality Using Time Series** | Python, Statistics Dec 2022
-- Performed analysis of time series data using rolling mean, standard deviation analysis and Augmented Dickey-Fuller tests, leading to the identification of key trends, patterns and data stationarity that improved
-forecasting accuracy by 12%.
-- Applied diverse smoothing techniques such as exponential smoothing and moving averages to eliminate noise and
-improve signal-to-noise ratio, leading to a 20% reduction in forecasting errors.
+**Intern** _Location Intelligence R&D dept._ | **PRECISELY** | TensorFlow, SQL, Python | Bangalore, India | Jan 2022 – June 2022 
+- Debugged and optimized 50+ SQL queries and validation pipelines across multiple international postal systems (Finland, India, China/HK), improving ETL accuracy by 6% and reducing validation time by 14%
+- Implemented address deduplication PoC using Bi-LSTM with GloVe embeddings, achieving 86% accuracy in identifying duplicate addresses across diverse formats
+- Contributed to a large-scale data cleaning and transformation pipeline processing 1M+ addresses, reducing duplicates by 40%, and collaborating with data science teams to ensure data consistency and reliability at scale
 
-**Flower Species Recognition** | Python, Neural networks, Keras, OpenCV Udacity - July 2021
-- Developed and deployed an image classification model using Keras and TensorFlow, achieving an accuracy rate of 83.4% in recognizing intricate variations among flower species in the Oxford 102 flower categories dataset.
-- Implemented data preprocessing techniques, feature extraction algorithms, and model tuning strategies to optimize the classifier’s accuracy by 10% and broaden its applicability in various fields of image recognition.
+# Projects & Research
 
-**Identification of Potential Donors** | Python, Data processing, TensorFlow, ML Udacity - April 2021
-- Evaluated and validated multiple supervised learning data models, resulting in a 7% increase in accuracy for donor identification.
-- Implemented feature engineering techniques to improve the performance of the chosen algorithm along with preprocessing methods, feature extraction, leading to a 16% reduction in mailing costs.
+**Synthetic Text Data Generation Pipeline with LoRA** | [Link](https://github.com/VedaVarshita/Synthetic-text-data-generation) | PyTorch, LoRA | June 2025 – July 2025
+- Designed and implemented an end-to-end machine learning data pipeline (ingest, validation, cleaning, monitoring) for synthetic text generation across AG News and IMDB datasets, enabling zero, one, and few-shot text generation
+- Orchestrated workflows with Prefect, containerized with Docker + CI/CD, and exposed the pipeline through RESTful APIs (FastAPI) for integration into downstream systems
+- Integrated logging using MLflow and monitoring to track generation quality and diversity (ROUGE-L, Self-BLEU, N-gram div.), ensuring continuous evaluation and reproducibility across 10+ tunable hyperparameters
+
+**LLaMA Vector Search Engine** | [Link](https://github.com/VedaVarshita/llama3.2_RAG_Application) | LangChain, Retrieval-Augmented Generation | Aug 2024 – Sept 2024
+- Architected AI research assistant using LangChain and LLaMA 3.2, enabling semantic search across 30+ ML research papers with Mean Reciprocal Rank of 86%
+- Implemented vector-based document retrieval system using FAISS and OllamaEmbeddings, reducing search latency by 56% while processing 5-6 chunks/second
+- Optimized search accuracy using Maximal Marginal Relevance (MMR) based retrieval system, improving result relevance by 27%, supporting parallel query processing and documented technical details for reproducibility
 
 # Technical Skills
-**Programming Languages** : C, C++, Python, Java, SQL
-**Libraries**: Pandas, NumPy, Matplotlib, Plotly, Scikit-Learn, SciPy, OpenCV
-**Developer Tools**: Git, Jenkins, Jira, TensorFlow, Jupyter Notebook, PyCharm, Pytorch, ImageJ, IntelliJ, Visual Studio Data Skills: Probability, Statistics, Exploratory Data Analysis, Data Visualization, Unsupervised Learning, Reinforcement Learning, Deep Learning, Computer Vision, Natural Language Processing.
+
+**Programming & Dev Tools**: Python, C/C++, Java, NumPy, Pandas, SQL, Git, Docker, Spark, AWS, Azure, Jira
+
+**ML/AI Tools**: Scikit-Learn, PyTorch, TensorFlow, OpenCV, LlamaIndex, HuggingFace, LangChain, ONNX, MLflow
+
+**LLMs & Gen AI**: Models (LLaMA, Mistral, OpenAI, Deepseek), LoRA, Finetuning, RAG, FAISS, Pinecone
 
 # Certifications
-- Introduction to Machine Learning using TensorFlow - _Udacity_ July 2021
-- Data Science for Engineers - _NPTEL_ Dec 2020
-- Mathematics for Machine Learning: Linear Algebra - _Coursera_ Mar 2021
-  
+
+- Introduction to Machine Learning using TensorFlow - [Udacity](https://confirm.udacity.com/4WTHAAKD) July 2021
+- Data Science for Engineers - [NPTEL](https://nptel.ac.in/noc/E_Certificate/NPTEL20CS72S42500326193762) Dec 2020
+
+# Achievements
+
+- Location Intelligence Hackathon Runner up ([Precisely](https://drive.google.com/file/d/1_T92K4bKQzvVeFIxtTEQwMZpjhSO59dl/view?usp=sharing))
+- CCI Dean's Fellowship ([Drexel](https://drive.google.com/file/d/13Z0V4Efz6xSRaqlohi9HM6jnbdQ9VdGT/view?usp=sharing))
