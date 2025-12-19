@@ -19,7 +19,7 @@ _Lovely Professional University_ Punjab, India **Bachelor of Technology, Electro
 
 # Experience
 
-**AI/ML Research Assistant** _CODED Lab, Drexel University_ | Advisor: Dr. Jake Williams | PyTorch, LLM | Philadelphia, PA | July 2024 – present
+**AI/ML Research Assistant** **_CODED Lab**, Drexel University_ | Advisor: Dr. Jake Williams | PyTorch, LLM | Philadelphia, PA | July 2024 – present
 - Expanded a novel Bayesian inspired neural network initialization algorithm leveraging co-occurrence and Product Quantization, improving pre-gradient update accuracy from ≈10% (random) to 65–74% on CIFAR-10 and MNIST
 - Validated the approach through weight evolution analysis, showing 76% cosine similarity between initialized and fully trained kernels, demonstrating its effectiveness as an informative warm-start for neural networks
 - Integrated RLHF with 1.5B parameter Language Model via preference-based fine-tuning with DPO and adaptive training, improving performance by 17% and reducing perplexity from 31.64 to 25.42 on HHH dataset
