@@ -5,88 +5,9 @@ categories: [Projects, Machine Learning, NLP]
 tags: [llama, langchain, rag, faiss, vector-search, semantic-search, nlp]
 ---
 
-<!-- ## Overview
-
-The LLaMA Vector Search Engine is an AI-powered research assistant that enables semantic search across machine learning research papers. Built using LangChain and LLaMA 3.2, this system provides researchers with an efficient way to discover and retrieve relevant academic literature through natural language queries.
-
-## Problem Statement
-
-Researchers and practitioners in machine learning face several challenges when working with academic literature:
-- **Information Overload**: Thousands of papers are published annually, making it difficult to find relevant work
-- **Keyword Limitations**: Traditional keyword-based search misses semantically similar but differently worded content
-- **Time Constraints**: Manually sifting through papers is time-consuming
-- **Context Understanding**: Need for systems that understand research context and relationships
-
-This vector search engine addresses these challenges by enabling semantic understanding of research content and providing fast, relevant retrieval.
-
-## Methodology
-
-### Architecture
-
-The system implements a Retrieval-Augmented Generation (RAG) architecture:
-
-1. **Document Processing**: Research papers are chunked and processed for embedding
-2. **Vector Embedding**: Documents are embedded using OllamaEmbeddings
-3. **Vector Store**: FAISS (Facebook AI Similarity Search) indexes embeddings for fast retrieval
-4. **Retrieval**: Maximal Marginal Relevance (MMR) algorithm selects diverse, relevant chunks
-5. **Generation**: LLaMA 3.2 generates contextual responses based on retrieved content
-
-### Key Innovations
-
-- **MMR-based Retrieval**: Balances relevance and diversity, preventing redundant results
-- **FAISS Vector Store**: Enables fast similarity search across large document collections
-- **Parallel Query Processing**: Supports concurrent queries for improved throughput
-- **Semantic Understanding**: Leverages LLaMA 3.2's capabilities for context-aware retrieval
-
-### Performance Optimizations
-
-- Optimized chunking strategy for research papers
-- Efficient embedding generation pipeline
-- Fast vector similarity search with FAISS
-- Parallel processing capabilities
-
-## Results
-
-- **Mean Reciprocal Rank (MRR)**: Achieved 86% MRR on 30+ ML research papers, indicating highly relevant search results
-- **Latency Reduction**: Reduced search latency by 56% compared to baseline approaches
-- **Processing Speed**: Processes 5-6 chunks per second
-- **Relevance Improvement**: MMR-based retrieval improved result relevance by 27% compared to standard similarity search
-- **Scalability**: Successfully handles parallel query processing
-- **Documentation**: Comprehensive technical documentation for reproducibility
-
-## Technologies Used
-
-- **LangChain**: Framework for building LLM applications and RAG systems
-- **LLaMA 3.2**: Large language model for understanding and generation
-- **FAISS**: Efficient similarity search and clustering of dense vectors
-- **OllamaEmbeddings**: Embedding generation for document representation
-- **RAG (Retrieval-Augmented Generation)**: Architecture pattern combining retrieval and generation
-- **Python**: Primary programming language
-
-## Repository
-
-[GitHub Repository](https://github.com/VedaVarshita/llama3.2_RAG_Application)
-
-## Applications
-
-- Academic research assistance
-- Literature review automation
-- Research paper discovery
-- Knowledge base search systems
-- Domain-specific information retrieval
-
-## Future Enhancements
-
-- Expand to additional research domains beyond ML
-- Implement citation network analysis
-- Add support for multi-modal content (figures, tables)
-- Integrate with academic databases (arXiv, PubMed)
-- Develop interactive visualization of search results -->
-
-
 <!--  -->
 
-# Building a High-Performance RAG System with LLaMA 3.2
+<!-- # Building a High-Performance RAG System with LLaMA 3.2
 
 ## Project Overview
 
@@ -262,5 +183,236 @@ These decisions prioritized **system understanding and performance tuning** over
 ## Conclusion
 
 This project demonstrates an **end-to-end RAG system built from first principles**, emphasizing retrieval optimization, modular design, and measurable performance improvements. It highlights practical trade-offs in deploying local LLM-powered systems and provides a strong foundation for extending toward production-grade AI applications.
+ -->
 
----
+ 
+
+
+
+
+
+## Overview
+This project implements a sophisticated RAG research assistant that combines:
+
+- Dense vector retrieval using FAISS for semantic search
+- Local LLM inference with LLaMA 3.2 via Ollama
+- Three operational modes: Standard RAG, LangGraph workflow, and DSPy optimization
+- Interactive web interface built with Gradio
+
+The system is designed for researchers and practitioners who need to quickly search and understand large collections of academic papers while maintaining full control over their data.
+
+This RAG system addresses these challenges through semantic search, intelligent retrieval strategies, and contextual answer generation.
+
+## Features
+### Core Capabilities
+
+- Semantic Search: Understanding query intent beyond keyword matching
+- Multi-Document Support: Process and index entire research paper collections
+- Three RAG Modes:
+
+    - Standard RAG: Direct retrieval and generation pipeline
+    - LangGraph: Workflow with document grading and conditional routing
+    - DSPy: Optimized prompting and structured generation
+
+
+- Interactive Web UI: User-friendly Gradio interface with real-time responses
+- Performance Analytics: Track query statistics, latency, and mode effectiveness
+- Source Attribution: Automatic citation of source documents
+
+### Technical Features
+
+Maximal Marginal Relevance (MMR) for diverse retrieval results
+Configurable chunk sizes and overlap for optimal retrieval
+FAISS-based vector indexing for fast similarity search
+Streaming responses for better user experience
+Session statistics and performance tracking
+Example questions for quick exploration
+
+## System Architecture
+┌─────────────────────────────────────────────────────────────┐
+│                     Document Processing                     │
+├─────────────────────────────────────────────────────────────┤
+│  PDF Loading → Text Splitting → Embedding → Vector Storage  │
+│  (PyMuPDF)     (Recursive)      (Nomic)     (FAISS)         │
+└─────────────────────────────────────────────────────────────┘
+                            ↓
+┌─────────────────────────────────────────────────────────────┐
+│                    Query Processing                         │
+├─────────────────────────────────────────────────────────────┤
+│                                                             │
+│  ┌─────────────┐  ┌──────────────┐  ┌─────────────┐         │
+│  │ Standard    │  │  LangGraph   │  │    DSPy     │         │
+│  │    RAG      │  │   Workflow   │  │ Optimized   │         │
+│  └─────────────┘  └──────────────┘  └─────────────┘         │
+│         ↓                 ↓                  ↓              │
+│         └─────────────────┴──────────────────┘              │
+│                           ↓                                 │
+│              MMR Retrieval (k=3, fetch_k=100)               │
+│                           ↓                                 │
+│              LLaMA 3.2 Generation (Ollama)                  │
+└─────────────────────────────────────────────────────────────┘
+                            ↓
+┌─────────────────────────────────────────────────────────────┐
+│                      Gradio Web UI                          │
+│  Chat Interface | Mode Selection | Statistics | Examples    │
+└─────────────────────────────────────────────────────────────┘
+
+
+
+## ⚙️ Configuration
+
+### Environment Variables
+
+| Variable | Default | Description |
+|----------|---------|-------------|
+| `EMBEDDING_MODEL` | `nomic-embed-text` | Ollama embedding model name |
+| `CHAT_MODEL` | `llama3.2:1b` | Ollama chat model name |
+| `BASE_URL` | `http://localhost:11434` | Ollama API endpoint |
+| `CHUNK_SIZE` | `1024` | Document chunk size in characters |
+| `CHUNK_OVERLAP` | `128` | Overlap between chunks |
+
+These parameters control model selection, document chunking behavior, and backend connectivity.
+
+
+## 📊 Performance Metrics
+
+### Overall Results
+
+| Metric | Standard RAG | LangGraph | DSPy |
+|--------|-------------|-----------|------|
+| **Quality Score** | 74% | 63% | 76% |
+| **Average Latency** | 1.79s | 1.31s | 1.06s |
+| **Success Rate** | 88% | 60% | 94% |
+| **MRR** | 0.82 | 0.71 | 0.86 |
+
+Key observations:
+- DSPy achieves the strongest overall performance  
+- LangGraph offers lower latency with stricter filtering  
+- Standard RAG provides a stable and reliable baseline  
+
+
+
+## Repository
+
+[GitHub Repository](https://github.com/VedaVarshita/llama3.2_RAG_Application)
+
+
+
+
+
+
+<!-- Hf_Spcae branch -->
+<!--
+## Project Overview
+This project addresses a critical challenge in modern AI research: how to efficiently extract relevant information from vast collections of academic literature. Traditional keyword search fails to capture semantic meaning, while manual review is time-intensive and doesn't scale.
+Solution: A fully local, modular RAG system that combines:
+
+Dense vector retrieval (FAISS) for semantic understanding
+Maximal Marginal Relevance (MMR) for diverse, non-redundant results
+Local LLM inference (LLaMA 3.2) for privacy and cost control
+Agent-based orchestration (LangGraph) for complex multi-step reasoning
+
+## Key Achievements
+
+86% Mean Reciprocal Rank (MRR) - retrieval accuracy benchmark
+56% latency reduction - optimized vector operations
+27% relevance improvement - MMR vs baseline similarity search
+94% success rate - with DSPy optimization mode
+30+ research papers - indexed and searchable
+
+
+## System Architecture
+The system follows a clean, modular design where each component has a single responsibility:
+┌─────────────────────────────────────────────────────────────┐
+│                     User Interface Layer                    │
+│              (Gradio Web UI / CLI Interface)                │
+└────────────────────────┬────────────────────────────────────┘
+                         │
+┌────────────────────────▼────────────────────────────────────┐
+│                   Orchestration Layer                       │
+│  ┌──────────────┐  ┌──────────────┐  ┌─────────────────┐    │
+│  │  Standard    │  │  LangGraph   │  │     DSPy        │    │
+│  │     RAG      │  │   Workflow   │  │  Optimization   │    │
+│  └──────────────┘  └──────────────┘  └─────────────────┘    │
+└────────────────────────┬────────────────────────────────────┘
+                         │
+┌────────────────────────▼────────────────────────────────────┐
+│                    Retrieval Layer                          │
+│  ┌──────────────────┐         ┌─────────────────────────┐   │
+│  │  FAISS Vector    │◄────────┤  MMR Retrieval          │   │
+│  │     Store        │         │  (k=3, fetch_k=100)     │   │
+│  └──────────────────┘         └─────────────────────────┘   │
+└────────────────────────┬────────────────────────────────────┘
+                         │
+┌────────────────────────▼────────────────────────────────────┐
+│                   Generation Layer                          │
+│  ┌──────────────────────────────────────────────────────┐   │
+│  │         LLaMA 3.2-3B Instruct (HuggingFace)          │   │
+│  │         • Temperature: 0.1                           │   │
+│  │         • Max Tokens: 512                            │   │
+│  └──────────────────────────────────────────────────────┘   │
+└────────────────────────┬────────────────────────────────────┘
+                         │
+┌────────────────────────▼────────────────────────────────────┐
+│                  Document Processing                        │
+│  ┌──────────┐  ┌──────────┐  ┌────────────┐  ┌──────────┐   │
+│  │   PDF    │─►│  Text    │─►│ Embedding  │─►│  FAISS   │   │
+│  │ Parsing  │  │Splitting │  │ Generation │  │ Indexing │   │
+│  └──────────┘  └──────────┘  └────────────┘  └──────────┘   │
+└─────────────────────────────────────────────────────────────┘
+## Component Breakdown
+
+1. Document Processing Pipeline
+
+PDF Parsing: PyMuPDF extracts text while preserving structure
+Chunking Strategy: 1024-token chunks with 128-token overlap
+Why it matters: Maintains semantic coherence while optimizing retrieval granularity
+
+2. Vector Store & Embeddings
+
+FAISS: In-memory vector database for fast similarity search
+Embeddings: sentence-transformers/all-MiniLM-L6-v2 (384 dimensions)
+Indexing: L2 distance metric with flat index structure
+Performance: Sub-second retrieval across 30+ documents
+
+3. Retrieval Strategy
+
+MMR Algorithm: Balances relevance and diversity
+Parameters: k=3 (top results), fetch_k=100 (candidate pool), λ=1 (diversity weight)
+Impact: +27% relevance improvement vs naive top-k search
+
+4. Three RAG Modes
+Standard RAG
+
+Direct retrieval → generation pipeline
+Fastest mode (avg 1.79s latency)
+74% quality score, 88% success rate
+
+LangGraph Workflow
+
+Stateful execution: Multi-step reasoning with conditional branching
+Document grading: Automatic relevance filtering
+Fallback handling: Graceful degradation when no relevant docs found
+1.31s avg latency, 60% success rate (experimental)
+
+DSPy Optimization ⭐ Recommended
+
+Prompt optimization: Learns from examples to refine prompts
+Quality: 76% (highest)
+Speed: 1.06s (fastest)
+Success: 94% (most reliable)
+
+## Technical Implementation
+### LangGraph Integration
+LangGraph enables sophisticated agent-based workflows with:
+
+State management: Tracks documents, generation status, and errors
+Conditional edges: Routes to generation or fallback based on document quality
+Retry logic: Automatically handles failures
+
+### DSPy Optimization
+DSPy treats prompts as learnable parameters:
+
+Automatically refines prompts based on retrieval quality
+Uses meta-llama/Llama-3.2-3B-Instruct
+Implements custom BaseLM wrapper for HuggingFace integration -->
