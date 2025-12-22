@@ -42,9 +42,14 @@ _Lovely Professional University_ Punjab, India **Bachelor of Technology, Electro
 - Integrated logging using MLflow and monitoring to track generation quality and diversity (ROUGE-L, Self-BLEU, N-gram div.), ensuring continuous evaluation and reproducibility across 10+ tunable hyperparameters
 
 **LLaMA Vector Search Engine** | [Link](https://github.com/VedaVarshita/llama3.2_RAG_Application) | LangChain, Retrieval-Augmented Generation | Aug 2024 – Sept 2024
-- Architected AI research assistant using LangChain and LLaMA 3.2, enabling semantic search across 30+ ML research papers with Mean Reciprocal Rank of 86%
+- Architected an AI research assistant using LangChain and LLaMA 3.2, enabling semantic search across 30+ ML research papers with a Mean Reciprocal Rank (MRR) of 86%
+- IImplemented a vector-based document retrieval pipeline using FAISS and OllamaEmbeddings, reducing search latency by 56% while processing 5–6 document chunks per second
+- Extended a stateful LangGraph workflow with conditional routing and automated document grading, achieving 94% success rate through multi-step query refinement and intelligent fallback mechanisms
+- Optimized RAG performance using DSPy prompt learning and MMR retrieval strategy, improving answer relevance by 27% and reducing generation latency to 1.06s while maintaining 76\% quality scores across 37 test queries
+
+<!-- - Architected AI research assistant using LangChain and LLaMA 3.2, enabling semantic search across 30+ ML research papers with Mean Reciprocal Rank of 86%
 - Implemented vector-based document retrieval system using FAISS and OllamaEmbeddings, reducing search latency by 56% while processing 5-6 chunks/second
-- Optimized search accuracy using Maximal Marginal Relevance (MMR) based retrieval system, improving result relevance by 27%, supporting parallel query processing and documented technical details for reproducibility
+- Optimized search accuracy using Maximal Marginal Relevance (MMR) based retrieval system, improving result relevance by 27%, supporting parallel query processing and documented technical details for reproducibility -->
 
 # Technical Skills
 
