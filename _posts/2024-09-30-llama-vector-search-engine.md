@@ -229,6 +229,8 @@ Session statistics and performance tracking
 Example questions for quick exploration
 
 ## System Architecture
+
+```text
 ┌─────────────────────────────────────────────────────────────┐
 │                     Document Processing                     │
 ├─────────────────────────────────────────────────────────────┤
@@ -256,6 +258,8 @@ Example questions for quick exploration
 │                      Gradio Web UI                          │
 │  Chat Interface | Mode Selection | Statistics | Examples    │
 └─────────────────────────────────────────────────────────────┘
+
+```
 
 
 
