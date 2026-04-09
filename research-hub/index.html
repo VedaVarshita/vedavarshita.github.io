@@ -548,55 +548,66 @@ async function fetchArxiv(){
   const btn=document.getElementById('fetch-btn');
   btn.disabled=true;btn.textContent='Fetching...';setStatus('paper-status','');
 
-  function fillFields(title,authors,year,abstract,url){
-    document.getElementById('p-title').value=title;
-    document.getElementById('p-authors').value=authors;
-    document.getElementById('p-year').value=year;
-    document.getElementById('p-url').value=url||`https://arxiv.org/abs/${id}`;
-    document.getElementById('p-abstract').value=abstract.slice(0,500);
+  // Worker URL — update this after deploying your Cloudflare Worker
+  const WORKER_URL='https://arxiv-proxy.YOUR_NAME.workers.dev';
+
+  try{
+    const res=await fetch(`${WORKER_URL}?id=${id}`);
+    if(!res.ok){
+      const err=await res.json().catch(()=>({}));
+      throw new Error(err.error||`Worker returned ${res.status}`);
+    }
+    const d=await res.json();
+    if(d.error)throw new Error(d.error);
+
+    document.getElementById('p-title').value=d.title||'';
+    document.getElementById('p-authors').value=d.authors||'';
+    document.getElementById('p-year').value=d.year||'';
+    document.getElementById('p-url').value=d.url||`https://arxiv.org/abs/${id}`;
+    document.getElementById('p-abstract').value=(d.abstract||'').slice(0,500);
     document.getElementById('p-source').value='arXiv';
-    document.getElementById('prev-title').textContent=title;
-    document.getElementById('prev-meta').textContent=authors+(year?' · '+year:'');
-    document.getElementById('prev-abst').textContent=abstract.slice(0,300);
+    document.getElementById('prev-title').textContent=d.title||'';
+    document.getElementById('prev-meta').textContent=(d.authors||'')+(d.year?' · '+d.year:'');
+    document.getElementById('prev-abst').textContent=(d.abstract||'').slice(0,300);
     document.getElementById('preview').style.display='block';
-  }
-
-  // Primary: Semantic Scholar API — proper CORS headers, free, no key
-  try{
-    const r=await fetch(`https://api.semanticscholar.org/graph/v1/paper/arXiv:${id}?fields=title,authors,year,abstract,openAccessPdf`,{headers:{'Accept':'application/json'}});
-    if(!r.ok)throw new Error(`S2 ${r.status}`);
-    const d=await r.json();
-    if(!d.title)throw new Error('empty');
-    fillFields(
-      d.title,
-      (d.authors||[]).map(a=>a.name).join(', '),
-      d.year||'',
-      (d.abstract||'').replace(/\s+/g,' ').trim(),
-      (d.openAccessPdf&&d.openAccessPdf.url)||`https://arxiv.org/abs/${id}`
-    );
     setStatus('paper-status','Metadata fetched — review then save','ok');
-    return;
-  }catch(e1){}
-
-  // Fallback: corsproxy.io → arXiv abstract page HTML parse
-  try{
-    const proxy=`https://corsproxy.io/?url=${encodeURIComponent('https://arxiv.org/abs/'+id)}`;
-    const r2=await fetch(proxy);
-    if(!r2.ok)throw new Error('proxy failed');
-    const doc=new DOMParser().parseFromString(await r2.text(),'text/html');
-    const title=(doc.querySelector('.title.mathjax')||doc.querySelector('h1.title')||{}).textContent?.replace(/^Title:/,'').trim()||'';
-    if(!title)throw new Error('parse failed');
-    const authorsEl=doc.querySelector('.authors');
-    const authors=authorsEl?Array.from(authorsEl.querySelectorAll('a')).map(a=>a.textContent.trim()).join(', '):'';
-    const abstract=(doc.querySelector('blockquote.abstract')||{}).textContent?.replace(/^Abstract:/,'').replace(/\s+/g,' ').trim()||'';
-    const ym=(doc.querySelector('.submission-history')||doc.querySelector('.dateline')||{textContent:''}).textContent.match(/20\d\d/);
-    fillFields(title,authors,ym?ym[0]:'',abstract,`https://arxiv.org/abs/${id}`);
-    setStatus('paper-status','Fetched (fallback) — review then save','ok');
-    return;
-  }catch(e2){}
-
-  setStatus('paper-status','Auto-fetch failed (very new paper?) — fill in manually','err');
-  btn.disabled=false;btn.textContent='Fetch metadata';
+  }catch(e){
+    // Worker not yet deployed? Fall back to Anthropic API
+    try{
+      const res2=await fetch('https://api.anthropic.com/v1/messages',{
+        method:'POST',
+        headers:{'Content-Type':'application/json','x-api-key':apiKey(),'anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true'},
+        body:JSON.stringify({
+          model:'claude-haiku-4-5-20251001',max_tokens:600,
+          system:'You are a paper metadata assistant. Return ONLY a JSON object with keys: title, authors (comma-separated), year (integer), abstract (max 400 chars). If unknown, return {"error":"unknown"}. No markdown, no backticks.',
+          messages:[{role:'user',content:`arXiv ID: ${id}  URL: https://arxiv.org/abs/${id}`}]
+        })
+      });
+      const data=await res2.json();
+      if(data.error)throw new Error(data.error.message);
+      const text=(data.content||[]).filter(b=>b.type==='text').map(b=>b.text).join('').trim();
+      const parsed=JSON.parse(text.replace(/```json|```/g,'').trim());
+      if(parsed.error==='unknown')throw new Error('unknown');
+      document.getElementById('p-title').value=parsed.title||'';
+      document.getElementById('p-authors').value=parsed.authors||'';
+      document.getElementById('p-year').value=parsed.year||'';
+      document.getElementById('p-url').value=`https://arxiv.org/abs/${id}`;
+      document.getElementById('p-abstract').value=(parsed.abstract||'').slice(0,500);
+      document.getElementById('p-source').value='arXiv';
+      document.getElementById('prev-title').textContent=parsed.title||'';
+      document.getElementById('prev-meta').textContent=(parsed.authors||'')+(parsed.year?' · '+parsed.year:'');
+      document.getElementById('prev-abst').textContent=(parsed.abstract||'').slice(0,300);
+      document.getElementById('preview').style.display='block';
+      setStatus('paper-status','Fetched via fallback — deploy Worker for better results','ok');
+    }catch(e2){
+      const msg=e2.message==='unknown'
+        ?'Paper not in training data — fill in manually'
+        :'Fetch failed — deploy the Cloudflare Worker or fill in manually';
+      setStatus('paper-status',msg,'err');
+    }
+  }finally{
+    btn.disabled=false;btn.textContent='Fetch metadata';
+  }
 }
 
 async function savePaper(){
