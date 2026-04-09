@@ -519,23 +519,17 @@ function getTags(){return Array.from(document.querySelectorAll('#note-tags .tag-
 function setStatus(id,msg,type){const e=document.getElementById(id);if(!e)return;e.textContent=msg;e.className='status-msg'+(type?' '+type:'')}
 function apiKey(){return localStorage.getItem('rh_key')||''}
 
-async function anthropic(prompt, useSearch) {
-  const body = {
-    model:'claude-sonnet-4-20250514',
-    max_tokens:1000,
-    mcp_servers:[{type:'url',url:'https://mcp.notion.com/mcp',name:'notion'}],
-    system:'You are a Notion assistant. Execute the requested operation exactly. Reply only "ok" on success or "error: reason" on failure.',
-    messages:[{role:'user',content:prompt}]
-  };
-  if (useSearch) {
-    body.tools=[{type:'web_search_20250305',name:'web_search'}];
-    body.system='You are a metadata extraction assistant. Return ONLY a JSON object, no markdown, no explanation.';
-    delete body.mcp_servers;
-  }
+async function anthropic(prompt) {
   const res = await fetch('https://api.anthropic.com/v1/messages',{
     method:'POST',
     headers:{'Content-Type':'application/json','x-api-key':apiKey(),'anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true'},
-    body:JSON.stringify(body)
+    body:JSON.stringify({
+      model:'claude-sonnet-4-20250514',
+      max_tokens:1000,
+      mcp_servers:[{type:'url',url:'https://mcp.notion.com/mcp',name:'notion'}],
+      system:'You are a Notion assistant. Execute the requested operation exactly. Reply only "ok" on success or "error: reason" on failure.',
+      messages:[{role:'user',content:prompt}]
+    })
   });
   const data = await res.json();
   if (data.error) throw new Error(data.error.message);
@@ -549,25 +543,40 @@ async function fetchArxiv(){
   const raw=document.getElementById('arxiv-input').value.trim();
   if(!raw)return;
   const m=raw.match(/(\d{4}\.\d{4,5}(v\d+)?)/);
-  if(!m){setStatus('paper-status','Could not parse arXiv ID','err');return}
+  if(!m){setStatus('paper-status','Could not parse arXiv ID — use format 2303.08774','err');return}
   const id=m[1];
   const btn=document.getElementById('fetch-btn');
   btn.disabled=true;btn.textContent='Fetching...';setStatus('paper-status','');
   try{
-    const text=await anthropic(`Fetch https://arxiv.org/abs/${id} and extract title, authors (comma-separated string), year (integer), abstract (max 350 chars), url. Return ONLY a JSON object with keys: title, authors, year, abstract, url.`,true);
-    const parsed=JSON.parse(text.replace(/```json|```/g,'').trim());
-    document.getElementById('p-title').value=parsed.title||'';
-    document.getElementById('p-authors').value=parsed.authors||'';
-    document.getElementById('p-year').value=parsed.year||'';
-    document.getElementById('p-url').value=parsed.url||`https://arxiv.org/abs/${id}`;
-    document.getElementById('p-abstract').value=parsed.abstract||'';
+    // Use arXiv's public Atom API — no key needed, CORS enabled
+    const res=await fetch(`https://export.arxiv.org/api/query?id_list=${id}`);
+    if(!res.ok)throw new Error('arXiv API error');
+    const xml=await res.text();
+    const doc=new DOMParser().parseFromString(xml,'application/xml');
+    const entry=doc.querySelector('entry');
+    if(!entry)throw new Error('Paper not found');
+
+    const title=(entry.querySelector('title')||{}).textContent?.replace(/\s+/g,' ').trim()||'';
+    const authors=Array.from(entry.querySelectorAll('author name')).map(n=>n.textContent.trim()).join(', ');
+    const published=(entry.querySelector('published')||{}).textContent||'';
+    const year=published?new Date(published).getFullYear():'';
+    const abstract=(entry.querySelector('summary')||{}).textContent?.replace(/\s+/g,' ').trim()||'';
+    const url=`https://arxiv.org/abs/${id}`;
+
+    document.getElementById('p-title').value=title;
+    document.getElementById('p-authors').value=authors;
+    document.getElementById('p-year').value=year;
+    document.getElementById('p-url').value=url;
+    document.getElementById('p-abstract').value=abstract.slice(0,500);
     document.getElementById('p-source').value='arXiv';
-    document.getElementById('prev-title').textContent=parsed.title||'';
-    document.getElementById('prev-meta').textContent=(parsed.authors||'')+(parsed.year?' · '+parsed.year:'');
-    document.getElementById('prev-abst').textContent=parsed.abstract||'';
+    document.getElementById('prev-title').textContent=title;
+    document.getElementById('prev-meta').textContent=authors+(year?' · '+year:'');
+    document.getElementById('prev-abst').textContent=abstract.slice(0,300);
     document.getElementById('preview').style.display='block';
     setStatus('paper-status','Metadata fetched — review then save','ok');
-  }catch(e){setStatus('paper-status','Fetch failed — fill in manually','err')}
+  }catch(e){
+    setStatus('paper-status','Could not reach arXiv API — check ID or fill in manually','err');
+  }
   finally{btn.disabled=false;btn.textContent='Fetch metadata'}
 }
 

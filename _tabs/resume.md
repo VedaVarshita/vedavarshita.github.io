@@ -36,16 +36,19 @@ _Lovely Professional University_ Punjab, India **Bachelor of Technology, Electro
 
 # Projects & Research
 
+
+**LLaMA Vector Search Engine** | [Link](https://github.com/VedaVarshita/llama3.2_RAG_Application/tree/extend_langGraph) | LangChain, Retrieval-Augmented Generation | Aug 2024 – Sept 2024
+- Architected an AI research assistant using LangChain and LLaMA 3.2, enabling semantic search across 30+ ML research papers with a Mean Reciprocal Rank (MRR) of 86%
+- Implemented a vector-based document retrieval pipeline using FAISS and OllamaEmbeddings, reducing search latency by 56% while processing 5–6 document chunks per second
+- Extended a stateful LangGraph workflow with conditional routing and automated document grading, achieving 94% success rate through multi-step query refinement and intelligent fallback mechanisms
+- Optimized RAG performance using DSPy prompt learning and MMR retrieval strategy, improving answer relevance by 27% and reducing generation latency to 1.06s while maintaining 76% quality scores across 37 test queries
+
 **Synthetic Text Data Generation Pipeline with LoRA** | [Link](https://github.com/VedaVarshita/Synthetic-text-data-generation) | PyTorch, LoRA | June 2025 – July 2025
 - Designed and implemented an end-to-end machine learning data pipeline (ingest, validation, cleaning, monitoring) for synthetic text generation across AG News and IMDB datasets, enabling zero, one, and few-shot text generation
 - Orchestrated workflows with Prefect, containerized with Docker + CI/CD, and exposed the pipeline through RESTful APIs (FastAPI) for integration into downstream systems
 - Integrated logging using MLflow and monitoring to track generation quality and diversity (ROUGE-L, Self-BLEU, N-gram div.), ensuring continuous evaluation and reproducibility across 10+ tunable hyperparameters
 
-**LLaMA Vector Search Engine** | [Link](https://github.com/VedaVarshita/llama3.2_RAG_Application) | LangChain, Retrieval-Augmented Generation | Aug 2024 – Sept 2024
-- Architected an AI research assistant using LangChain and LLaMA 3.2, enabling semantic search across 30+ ML research papers with a Mean Reciprocal Rank (MRR) of 86%
-- Implemented a vector-based document retrieval pipeline using FAISS and OllamaEmbeddings, reducing search latency by 56% while processing 5–6 document chunks per second
-- Extended a stateful LangGraph workflow with conditional routing and automated document grading, achieving 94% success rate through multi-step query refinement and intelligent fallback mechanisms
-- Optimized RAG performance using DSPy prompt learning and MMR retrieval strategy, improving answer relevance by 27% and reducing generation latency to 1.06s while maintaining 76% quality scores across 37 test queries
+
 
 <!-- - Architected AI research assistant using LangChain and LLaMA 3.2, enabling semantic search across 30+ ML research papers with Mean Reciprocal Rank of 86%
 - Implemented vector-based document retrieval system using FAISS and OllamaEmbeddings, reducing search latency by 56% while processing 5-6 chunks/second
@@ -58,6 +61,8 @@ _Lovely Professional University_ Punjab, India **Bachelor of Technology, Electro
 **ML/AI Tools**: Scikit-Learn, PyTorch, TensorFlow, OpenCV, LlamaIndex, HuggingFace, LangChain, ONNX, MLflow
 
 **LLMs & Gen AI**: Models (LLaMA, Mistral, OpenAI, Deepseek), LoRA, Finetuning, RAG, FAISS, Pinecone
+
+**Core competencies**: Probability, Statistics, Exploratory Data Analysis, Data Visualization, Unsupervised Learning, Reinforcement Learning, Deep Learning, Computer Vision, Natural Language Processing
 
 # Certifications
 
