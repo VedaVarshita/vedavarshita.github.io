@@ -542,42 +542,61 @@ async function anthropic(prompt) {
 async function fetchArxiv(){
   const raw=document.getElementById('arxiv-input').value.trim();
   if(!raw)return;
-  const m=raw.match(/(\d{4}\.\d{4,5}(v\d+)?)/);
+  const m=raw.match(/(\d{4}\.\d{4,5}(?:v\d+)?)/);
   if(!m){setStatus('paper-status','Could not parse arXiv ID — use format 2303.08774','err');return}
-  const id=m[1];
+  const id=m[1].replace(/v\d+$/,'');
   const btn=document.getElementById('fetch-btn');
   btn.disabled=true;btn.textContent='Fetching...';setStatus('paper-status','');
-  try{
-    // Use arXiv's public Atom API — no key needed, CORS enabled
-    const res=await fetch(`https://export.arxiv.org/api/query?id_list=${id}`);
-    if(!res.ok)throw new Error('arXiv API error');
-    const xml=await res.text();
-    const doc=new DOMParser().parseFromString(xml,'application/xml');
-    const entry=doc.querySelector('entry');
-    if(!entry)throw new Error('Paper not found');
 
-    const title=(entry.querySelector('title')||{}).textContent?.replace(/\s+/g,' ').trim()||'';
-    const authors=Array.from(entry.querySelectorAll('author name')).map(n=>n.textContent.trim()).join(', ');
-    const published=(entry.querySelector('published')||{}).textContent||'';
-    const year=published?new Date(published).getFullYear():'';
-    const abstract=(entry.querySelector('summary')||{}).textContent?.replace(/\s+/g,' ').trim()||'';
-    const url=`https://arxiv.org/abs/${id}`;
-
+  function fillFields(title,authors,year,abstract,url){
     document.getElementById('p-title').value=title;
     document.getElementById('p-authors').value=authors;
     document.getElementById('p-year').value=year;
-    document.getElementById('p-url').value=url;
+    document.getElementById('p-url').value=url||`https://arxiv.org/abs/${id}`;
     document.getElementById('p-abstract').value=abstract.slice(0,500);
     document.getElementById('p-source').value='arXiv';
     document.getElementById('prev-title').textContent=title;
     document.getElementById('prev-meta').textContent=authors+(year?' · '+year:'');
     document.getElementById('prev-abst').textContent=abstract.slice(0,300);
     document.getElementById('preview').style.display='block';
-    setStatus('paper-status','Metadata fetched — review then save','ok');
-  }catch(e){
-    setStatus('paper-status','Could not reach arXiv API — check ID or fill in manually','err');
   }
-  finally{btn.disabled=false;btn.textContent='Fetch metadata'}
+
+  // Primary: Semantic Scholar API — proper CORS headers, free, no key
+  try{
+    const r=await fetch(`https://api.semanticscholar.org/graph/v1/paper/arXiv:${id}?fields=title,authors,year,abstract,openAccessPdf`,{headers:{'Accept':'application/json'}});
+    if(!r.ok)throw new Error(`S2 ${r.status}`);
+    const d=await r.json();
+    if(!d.title)throw new Error('empty');
+    fillFields(
+      d.title,
+      (d.authors||[]).map(a=>a.name).join(', '),
+      d.year||'',
+      (d.abstract||'').replace(/\s+/g,' ').trim(),
+      (d.openAccessPdf&&d.openAccessPdf.url)||`https://arxiv.org/abs/${id}`
+    );
+    setStatus('paper-status','Metadata fetched — review then save','ok');
+    return;
+  }catch(e1){}
+
+  // Fallback: corsproxy.io → arXiv abstract page HTML parse
+  try{
+    const proxy=`https://corsproxy.io/?url=${encodeURIComponent('https://arxiv.org/abs/'+id)}`;
+    const r2=await fetch(proxy);
+    if(!r2.ok)throw new Error('proxy failed');
+    const doc=new DOMParser().parseFromString(await r2.text(),'text/html');
+    const title=(doc.querySelector('.title.mathjax')||doc.querySelector('h1.title')||{}).textContent?.replace(/^Title:/,'').trim()||'';
+    if(!title)throw new Error('parse failed');
+    const authorsEl=doc.querySelector('.authors');
+    const authors=authorsEl?Array.from(authorsEl.querySelectorAll('a')).map(a=>a.textContent.trim()).join(', '):'';
+    const abstract=(doc.querySelector('blockquote.abstract')||{}).textContent?.replace(/^Abstract:/,'').replace(/\s+/g,' ').trim()||'';
+    const ym=(doc.querySelector('.submission-history')||doc.querySelector('.dateline')||{textContent:''}).textContent.match(/20\d\d/);
+    fillFields(title,authors,ym?ym[0]:'',abstract,`https://arxiv.org/abs/${id}`);
+    setStatus('paper-status','Fetched (fallback) — review then save','ok');
+    return;
+  }catch(e2){}
+
+  setStatus('paper-status','Auto-fetch failed (very new paper?) — fill in manually','err');
+  btn.disabled=false;btn.textContent='Fetch metadata';
 }
 
 async function savePaper(){
