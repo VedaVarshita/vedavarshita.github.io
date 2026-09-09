@@ -1,0 +1,829 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>Research Hub</title>
+<style>
+:root{
+  --bg:#ffffff;--bg2:#f7f7f5;--bg3:#f0f0ec;
+  --border:#e5e5e2;--border2:#d0d0cc;
+  --text:#1a1a1a;--text2:#666;--text3:#999;
+  --blue:#1d4ed8;--blue-bg:#eff6ff;--blue-border:#bfdbfe;
+  --green:#16a34a;--red:#dc2626;--amber:#b45309;
+  --radius:8px;--radius-lg:12px;
+}
+@media(prefers-color-scheme:dark){
+  :root{
+    --bg:#1c1c1e;--bg2:#2c2c2e;--bg3:#3a3a3c;
+    --border:#3a3a3c;--border2:#48484a;
+    --text:#f5f5f0;--text2:#a0a09a;--text3:#666;
+    --blue-bg:#1e3a5f;--blue-border:#2563eb;
+  }
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;font-size:14px;background:var(--bg);color:var(--text);min-height:100vh}
+
+/* ── Auth screens ── */
+#auth-wrap{display:flex;align-items:center;justify-content:center;min-height:100vh;padding:2rem}
+.auth-card{background:var(--bg);border:1px solid var(--border);border-radius:var(--radius-lg);padding:2.5rem;width:100%;max-width:400px}
+.auth-card h1{font-size:20px;font-weight:600;margin-bottom:6px}
+.auth-card p{font-size:13px;color:var(--text2);margin-bottom:1.5rem;line-height:1.6}
+.auth-card label{display:block;font-size:12px;color:var(--text2);margin-bottom:4px;margin-top:1rem}
+.auth-card label:first-of-type{margin-top:0}
+.auth-card input{width:100%;padding:9px 12px;font-size:14px;border:1px solid var(--border2);border-radius:var(--radius);background:var(--bg);color:var(--text);font-family:inherit}
+.auth-card input:focus{outline:none;border-color:var(--blue)}
+.pin-row{display:flex;gap:10px;justify-content:center;margin:1rem 0}
+.pin-dot{width:44px;height:44px;border:1px solid var(--border2);border-radius:var(--radius);text-align:center;font-size:20px;font-weight:600;background:var(--bg);color:var(--text);letter-spacing:2px}
+.pin-dot:focus{outline:none;border-color:var(--blue)}
+.btn{width:100%;padding:10px;font-size:14px;font-weight:500;border:1px solid var(--border2);border-radius:var(--radius);background:var(--text);color:var(--bg);cursor:pointer;margin-top:1.25rem;transition:opacity .15s}
+.btn:hover{opacity:.85}
+.btn:disabled{opacity:.4;cursor:default}
+.btn-sec{background:var(--bg2);color:var(--text);border-color:var(--border)}
+.err-msg{font-size:12px;color:var(--red);margin-top:8px;min-height:16px}
+.steps{background:var(--bg2);border-radius:var(--radius);padding:1rem;font-size:12px;color:var(--text2);line-height:1.8;margin-bottom:1.5rem}
+.steps a{color:var(--blue);text-decoration:none}
+.steps code{background:var(--bg3);padding:1px 5px;border-radius:4px;font-size:11px}
+
+/* ── Main app ── */
+#app{display:none;flex-direction:column;min-height:100vh}
+.topbar{display:flex;align-items:center;gap:12px;padding:0 1.5rem;height:52px;border-bottom:1px solid var(--border);background:var(--bg)}
+.topbar h1{font-size:15px;font-weight:600;flex:1}
+.topbar-links{display:flex;gap:6px}
+.tl-btn{padding:5px 12px;font-size:12px;border:1px solid var(--border);border-radius:var(--radius);background:transparent;color:var(--text2);cursor:pointer;text-decoration:none;display:inline-flex;align-items:center;gap:4px}
+.tl-btn:hover{background:var(--bg2);color:var(--text)}
+
+/* tabs */
+.tabs{display:flex;border-bottom:1px solid var(--border);background:var(--bg);padding:0 1.5rem}
+.tab{padding:10px 16px;font-size:13px;cursor:pointer;color:var(--text2);border-bottom:2px solid transparent;background:none;border-top:none;border-left:none;border-right:none;transition:all .15s}
+.tab.active{color:var(--text);border-bottom-color:var(--text);font-weight:500}
+.tab:hover:not(.active){color:var(--text)}
+
+.content{flex:1;padding:1.5rem;max-width:780px;margin:0 auto;width:100%}
+.panel{display:none}.panel.active{display:block}
+
+/* form elements */
+label.fl{display:block;font-size:12px;color:var(--text2);margin-bottom:4px;margin-top:14px}
+label.fl:first-child{margin-top:0}
+input.fi,textarea.fi,select.fi{width:100%;padding:8px 10px;font-size:13px;border:1px solid var(--border2);border-radius:var(--radius);background:var(--bg);color:var(--text);font-family:inherit}
+input.fi:focus,textarea.fi:focus,select.fi:focus{outline:none;border-color:var(--blue)}
+textarea.fi{resize:vertical;min-height:88px;line-height:1.5}
+.row2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.row3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px}
+.action-row{display:flex;gap:10px;align-items:center;margin-top:1.25rem;flex-wrap:wrap}
+.save-btn{padding:8px 22px;font-size:13px;font-weight:500;border:1px solid var(--text);border-radius:var(--radius);background:var(--text);color:var(--bg);cursor:pointer;transition:opacity .15s}
+.save-btn:hover{opacity:.85}
+.save-btn:disabled{opacity:.35;cursor:default}
+.clear-btn{padding:8px 16px;font-size:13px;border:1px solid var(--border);border-radius:var(--radius);background:var(--bg2);color:var(--text2);cursor:pointer}
+.status-msg{font-size:12px;color:var(--text3)}
+.status-msg.ok{color:var(--green)}
+.status-msg.err{color:var(--red)}
+.divider{height:1px;background:var(--border);margin:1.25rem 0}
+
+/* preview card */
+#preview{display:none;margin:12px 0;padding:14px;background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius-lg)}
+#preview h4{font-size:14px;font-weight:500;margin-bottom:4px;line-height:1.4}
+#preview .pmeta{font-size:12px;color:var(--text2);margin-bottom:6px}
+#preview .pabst{font-size:12px;color:var(--text2);line-height:1.6;max-height:72px;overflow:hidden}
+
+/* tags & CT grid */
+.tag-row{display:flex;flex-wrap:wrap;gap:6px;margin-top:6px}
+.tag-chip{padding:3px 10px;font-size:11px;border-radius:20px;border:1px solid var(--border);cursor:pointer;background:var(--bg);color:var(--text2);transition:all .1s;user-select:none}
+.tag-chip.on{background:var(--blue-bg);border-color:var(--blue-border);color:var(--blue)}
+.ct-grid{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-top:6px}
+.ct-opt{padding:7px 10px;font-size:12px;border:1px solid var(--border);border-radius:var(--radius);cursor:pointer;background:var(--bg);color:var(--text2);text-align:center;transition:all .1s;user-select:none}
+.ct-opt.on{background:var(--blue-bg);border-color:var(--blue-border);color:var(--blue);font-weight:500}
+
+/* graph tab */
+#graph-controls{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-bottom:12px}
+.pill{display:inline-flex;align-items:center;gap:5px;padding:3px 10px;border-radius:20px;font-size:12px;cursor:pointer;border:1.5px solid transparent;user-select:none;transition:opacity .15s}
+.pill.off{opacity:.25}
+.s-btn{padding:3px 10px;font-size:12px;border:1px solid var(--border);border-radius:20px;cursor:pointer;background:var(--bg);color:var(--text2)}
+.s-btn.on{background:var(--bg3);color:var(--text);border-color:var(--border2)}
+#graph-box{border:1px solid var(--border);border-radius:var(--radius-lg);background:var(--bg2);overflow:hidden;position:relative}
+#graph-svg{display:block;width:100%}
+#graph-info{margin-top:10px;padding:12px 14px;border:1px solid var(--border);border-radius:var(--radius-lg);background:var(--bg);min-height:60px}
+#graph-info h3{font-size:13px;font-weight:500;margin-bottom:4px}
+#graph-info p{font-size:12px;color:var(--text2);line-height:1.5}
+.conn-chips{display:flex;flex-wrap:wrap;gap:5px;margin-top:6px}
+.conn-chip{font-size:11px;padding:2px 8px;border-radius:20px;border:1px solid var(--border);color:var(--text2)}
+#empty-graph{display:none;position:absolute;inset:0;align-items:center;justify-content:center;flex-direction:column;gap:8px;color:var(--text3);font-size:13px;text-align:center;padding:2rem}
+
+/* settings */
+.setting-row{display:flex;align-items:center;justify-content:space-between;padding:14px 0;border-bottom:1px solid var(--border)}
+.setting-row:last-child{border-bottom:none}
+.setting-label{font-size:13px;font-weight:500}
+.setting-desc{font-size:12px;color:var(--text2);margin-top:2px}
+.setting-action{padding:6px 14px;font-size:12px;border:1px solid var(--border);border-radius:var(--radius);background:var(--bg2);color:var(--text);cursor:pointer}
+.setting-action.danger{border-color:#fca5a5;background:#fff1f1;color:var(--red)}
+.info-box{background:var(--blue-bg);border:1px solid var(--blue-border);border-radius:var(--radius);padding:12px 14px;font-size:12px;color:var(--text2);line-height:1.7;margin-bottom:1.25rem}
+.info-box a{color:var(--blue)}
+.info-box strong{color:var(--text)}
+</style>
+</head>
+<body>
+
+<!-- ══════════════════════════════════════════
+     SETUP SCREEN (first visit)
+══════════════════════════════════════════ -->
+<div id="screen-setup" style="display:none">
+  <div id="auth-wrap">
+    <div class="auth-card">
+      <h1>Research Hub — first time setup</h1>
+      <p>Enter your Anthropic API key to get started. It's stored only in your browser's localStorage and never sent anywhere except the Anthropic API.</p>
+
+      <div class="steps">
+        1. Get your key at <a href="https://console.anthropic.com/settings/keys" target="_blank">console.anthropic.com</a><br>
+        2. Make sure your Notion integration is connected<br>
+        3. Set a PIN — this is your only login step on return visits
+      </div>
+
+      <label class="fl">Anthropic API key</label>
+      <input class="fi" id="setup-key" type="password" placeholder="sk-ant-api03-..." autocomplete="off"/>
+
+      <label class="fl">Set a 4-digit PIN (for future logins)</label>
+      <div class="pin-row">
+        <input class="pin-dot" id="sp0" maxlength="1" type="password" inputmode="numeric" oninput="pinMove(this,'sp1')"/>
+        <input class="pin-dot" id="sp1" maxlength="1" type="password" inputmode="numeric" oninput="pinMove(this,'sp2')"/>
+        <input class="pin-dot" id="sp2" maxlength="1" type="password" inputmode="numeric" oninput="pinMove(this,'sp3')"/>
+        <input class="pin-dot" id="sp3" maxlength="1" type="password" inputmode="numeric"/>
+      </div>
+
+      <div class="err-msg" id="setup-err"></div>
+      <button class="btn" onclick="completeSetup()">Set up and continue</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════
+     PIN LOCK SCREEN (return visits)
+══════════════════════════════════════════ -->
+<div id="screen-lock" style="display:none">
+  <div id="auth-wrap">
+    <div class="auth-card">
+      <h1>Research Hub</h1>
+      <p>Enter your PIN to unlock.</p>
+      <div class="pin-row">
+        <input class="pin-dot" id="lp0" maxlength="1" type="password" inputmode="numeric" oninput="pinMove(this,'lp1');tryUnlock()"/>
+        <input class="pin-dot" id="lp1" maxlength="1" type="password" inputmode="numeric" oninput="pinMove(this,'lp2');tryUnlock()"/>
+        <input class="pin-dot" id="lp2" maxlength="1" type="password" inputmode="numeric" oninput="pinMove(this,'lp3');tryUnlock()"/>
+        <input class="pin-dot" id="lp3" maxlength="1" type="password" inputmode="numeric" oninput="tryUnlock()"/>
+      </div>
+      <div class="err-msg" id="lock-err"></div>
+      <button class="btn btn-sec" onclick="resetAll()" style="margin-top:2rem;font-size:12px">Reset &amp; re-setup</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════
+     MAIN APP
+══════════════════════════════════════════ -->
+<div id="app">
+  <div class="topbar">
+    <h1>Research Hub</h1>
+    <div class="topbar-links">
+      <a class="tl-btn" href="https://www.notion.so/33ceaa9ff69381a48e18fd2ee9859d05" target="_blank">Notion workspace</a>
+      <button class="tl-btn" onclick="switchTab('settings',null,true)">Settings</button>
+      <button class="tl-btn" onclick="lockApp()">Lock</button>
+    </div>
+  </div>
+
+  <div class="tabs">
+    <button class="tab active" onclick="switchTab('paper',this)">Add paper</button>
+    <button class="tab" onclick="switchTab('note',this)">Add note</button>
+    <button class="tab" onclick="switchTab('conn',this)">Add connection</button>
+    <button class="tab" onclick="switchTab('graph',this)">Graph view</button>
+    <button class="tab" id="tab-settings" style="display:none" onclick="switchTab('settings',this)">Settings</button>
+  </div>
+
+  <div class="content">
+
+    <!-- ── ADD PAPER ── -->
+    <div id="panel-paper" class="panel active">
+      <label class="fl">arXiv URL or ID</label>
+      <div style="display:flex;gap:8px">
+        <input class="fi" id="arxiv-input" placeholder="https://arxiv.org/abs/2303.08774  or  2303.08774" style="flex:1"/>
+        <button class="save-btn" id="fetch-btn" onclick="fetchArxiv()" style="white-space:nowrap">Fetch metadata</button>
+      </div>
+      <div id="preview">
+        <h4 id="prev-title"></h4>
+        <div class="pmeta" id="prev-meta"></div>
+        <div class="pabst" id="prev-abst"></div>
+      </div>
+      <div class="divider"></div>
+      <p style="font-size:12px;color:var(--text3);margin-bottom:10px">Or enter manually:</p>
+      <label class="fl">Paper title</label>
+      <input class="fi" id="p-title" placeholder="Full paper title"/>
+      <div class="row2">
+        <div><label class="fl">Authors</label><input class="fi" id="p-authors" placeholder="Author A, Author B"/></div>
+        <div><label class="fl">Year</label><input class="fi" id="p-year" placeholder="2024"/></div>
+      </div>
+      <label class="fl">DOI / URL</label>
+      <input class="fi" id="p-url" placeholder="https://arxiv.org/abs/..."/>
+      <div class="row2">
+        <div>
+          <label class="fl">Source</label>
+          <select class="fi" id="p-source">
+            <option>arXiv</option><option>PubMed</option><option>Google Scholar</option>
+            <option>PDF Upload</option><option>Shared Link</option><option>Semantic Scholar</option>
+          </select>
+        </div>
+        <div>
+          <label class="fl">Reading status</label>
+          <select class="fi" id="p-status">
+            <option>Unread</option><option>Reading</option><option>Done</option><option>Skimmed</option>
+          </select>
+        </div>
+      </div>
+      <label class="fl">Abstract / notes</label>
+      <textarea class="fi" id="p-abstract" placeholder="Paste abstract or write a brief summary..."></textarea>
+      <div class="action-row">
+        <button class="save-btn" id="save-paper-btn" onclick="savePaper()">Save to Notion</button>
+        <button class="clear-btn" onclick="clearPaper()">Clear</button>
+        <span class="status-msg" id="paper-status"></span>
+      </div>
+    </div>
+
+    <!-- ── ADD NOTE ── -->
+    <div id="panel-note" class="panel">
+      <label class="fl">Note title</label>
+      <input class="fi" id="n-title" placeholder="e.g. Attention mechanism comparison across papers"/>
+      <div class="row2">
+        <div>
+          <label class="fl">Note type</label>
+          <select class="fi" id="n-type">
+            <option>Paper note</option><option>Cross-paper synthesis</option>
+            <option>Research idea</option><option>Open question</option>
+            <option>Method note</option><option>Critique</option><option>Summary</option>
+          </select>
+        </div>
+        <div>
+          <label class="fl">Confidence</label>
+          <select class="fi" id="n-conf">
+            <option>High</option><option>Medium</option><option>Low</option><option>Uncertain</option>
+          </select>
+        </div>
+      </div>
+      <label class="fl">Related papers (comma-separated)</label>
+      <input class="fi" id="n-papers" placeholder="Paper A, Paper B, Paper C"/>
+      <label class="fl">Key insight (one line)</label>
+      <input class="fi" id="n-insight" placeholder="The single most important takeaway"/>
+      <label class="fl">Full note</label>
+      <textarea class="fi" id="n-body" style="min-height:130px" placeholder="Write your thought, synthesis, critique, or question here..."></textarea>
+      <label class="fl">Tags</label>
+      <div class="tag-row" id="note-tags">
+        <span class="tag-chip" onclick="toggleTag(this)">methodology</span>
+        <span class="tag-chip" onclick="toggleTag(this)">findings</span>
+        <span class="tag-chip" onclick="toggleTag(this)">limitations</span>
+        <span class="tag-chip" onclick="toggleTag(this)">future work</span>
+        <span class="tag-chip" onclick="toggleTag(this)">theory</span>
+        <span class="tag-chip" onclick="toggleTag(this)">replication</span>
+        <span class="tag-chip" onclick="toggleTag(this)">data</span>
+        <span class="tag-chip" onclick="toggleTag(this)">ethics</span>
+      </div>
+      <div class="action-row">
+        <button class="save-btn" id="save-note-btn" onclick="saveNote()">Save to Notion</button>
+        <button class="clear-btn" onclick="clearNote()">Clear</button>
+        <span class="status-msg" id="note-status"></span>
+      </div>
+    </div>
+
+    <!-- ── ADD CONNECTION ── -->
+    <div id="panel-conn" class="panel">
+      <label class="fl">Paper A (source)</label>
+      <input class="fi" id="c-a" placeholder="Title of the first paper"/>
+      <label class="fl">Paper B (target)</label>
+      <input class="fi" id="c-b" placeholder="Title of the second paper"/>
+      <label class="fl">Connection type</label>
+      <div class="ct-grid" id="conn-types">
+        <span class="ct-opt" onclick="toggleCT(this)">cites</span>
+        <span class="ct-opt" onclick="toggleCT(this)">cited by</span>
+        <span class="ct-opt on" onclick="toggleCT(this)">same methodology</span>
+        <span class="ct-opt" onclick="toggleCT(this)">same dataset</span>
+        <span class="ct-opt" onclick="toggleCT(this)">contradicts</span>
+        <span class="ct-opt" onclick="toggleCT(this)">extends / builds on</span>
+        <span class="ct-opt" onclick="toggleCT(this)">thematic overlap</span>
+        <span class="ct-opt" onclick="toggleCT(this)">same authors</span>
+      </div>
+      <div class="row2" style="margin-top:14px">
+        <div>
+          <label class="fl">Strength</label>
+          <select class="fi" id="c-strength">
+            <option>Strong</option><option>Moderate</option><option>Weak</option>
+          </select>
+        </div>
+      </div>
+      <label class="fl">Notes (why are they connected?)</label>
+      <textarea class="fi" id="c-notes" placeholder="Describe the specific link between these papers..."></textarea>
+      <div class="action-row">
+        <button class="save-btn" id="save-conn-btn" onclick="saveConnection()">Save to Notion</button>
+        <button class="clear-btn" onclick="clearConn()">Clear</button>
+        <span class="status-msg" id="conn-status"></span>
+      </div>
+    </div>
+
+    <!-- ── GRAPH VIEW ── -->
+    <div id="panel-graph" class="panel">
+      <div id="graph-controls">
+        <button class="save-btn" id="sync-btn" onclick="syncGraph()" style="padding:6px 16px">Sync from Notion</button>
+        <button class="clear-btn" onclick="loadDemoGraph()">Demo data</button>
+        <span class="status-msg" id="graph-status" style="margin-right:8px"></span>
+        <div id="ct-pills"></div>
+        <div style="display:flex;gap:6px;margin-left:4px">
+          <button class="s-btn on" onclick="toggleStrength(this,'Strong')">Strong</button>
+          <button class="s-btn on" onclick="toggleStrength(this,'Moderate')">Moderate</button>
+          <button class="s-btn on" onclick="toggleStrength(this,'Weak')">Weak</button>
+        </div>
+      </div>
+      <div id="graph-box" style="height:460px">
+        <svg id="graph-svg" height="460">
+          <defs>
+            <marker id="arr" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="5" markerHeight="5" orient="auto-start-reverse">
+              <path d="M1 1L7 4L1 7" fill="none" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" stroke="context-stroke"/>
+            </marker>
+          </defs>
+          <g id="g-links"></g>
+          <g id="g-nodes"></g>
+        </svg>
+        <div id="empty-graph">
+          <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M2 12h2M20 12h2"/></svg>
+          <span>No connections yet — add some or load demo data</span>
+        </div>
+      </div>
+      <div id="graph-info"><p style="color:var(--text3);font-size:12px">Click a node to see its connections</p></div>
+    </div>
+
+    <!-- ── SETTINGS ── -->
+    <div id="panel-settings" class="panel">
+      <div class="info-box">
+        Your API key and PIN are stored only in <strong>this browser's localStorage</strong>. They are never transmitted anywhere except to <strong>api.anthropic.com</strong> when you perform an action.
+      </div>
+
+      <div class="setting-row">
+        <div>
+          <div class="setting-label">Notion workspace</div>
+          <div class="setting-desc">Your Literature Review System home page</div>
+        </div>
+        <a class="setting-action" href="https://www.notion.so/33ceaa9ff69381a48e18fd2ee9859d05" target="_blank">Open</a>
+      </div>
+      <div class="setting-row">
+        <div>
+          <div class="setting-label">Papers DB</div>
+          <div class="setting-desc">Every paper you read</div>
+        </div>
+        <a class="setting-action" href="https://www.notion.so/b54aae7168d54fe5a9429adda0d27df3" target="_blank">Open</a>
+      </div>
+      <div class="setting-row">
+        <div>
+          <div class="setting-label">Connections DB</div>
+          <div class="setting-desc">Paper relationships &amp; graph source</div>
+        </div>
+        <a class="setting-action" href="https://www.notion.so/940344af9187437dab98f234a40e17c1" target="_blank">Open</a>
+      </div>
+      <div class="setting-row">
+        <div>
+          <div class="setting-label">Notes DB</div>
+          <div class="setting-desc">Your thoughts and synthesis</div>
+        </div>
+        <a class="setting-action" href="https://www.notion.so/21efc08f19b9429b9c7a8a4f43f211a7" target="_blank">Open</a>
+      </div>
+      <div class="setting-row">
+        <div>
+          <div class="setting-label">Update Anthropic API key</div>
+          <div class="setting-desc">Replace the stored key with a new one</div>
+        </div>
+        <button class="setting-action" onclick="updateKey()">Update</button>
+      </div>
+      <div class="setting-row">
+        <div>
+          <div class="setting-label">Change PIN</div>
+          <div class="setting-desc">Set a new 4-digit PIN</div>
+        </div>
+        <button class="setting-action" onclick="changePin()">Change</button>
+      </div>
+      <div class="setting-row">
+        <div>
+          <div class="setting-label">Reset everything</div>
+          <div class="setting-desc">Clear API key, PIN, and all local data</div>
+        </div>
+        <button class="setting-action danger" onclick="resetAll()">Reset</button>
+      </div>
+    </div>
+
+  </div><!-- /content -->
+</div><!-- /app -->
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.9.0/d3.min.js"></script>
+<script>
+
+// ════════════════════════════════
+//  AUTH
+// ════════════════════════════════
+function pinMove(el, nextId) {
+  if (el.value.length >= 1 && nextId) {
+    const n = document.getElementById(nextId);
+    if (n) { n.focus(); }
+  }
+}
+
+function getPin(prefix) {
+  return ['0','1','2','3'].map(i => (document.getElementById(prefix+i)||{value:''}).value).join('');
+}
+
+function completeSetup() {
+  const key = document.getElementById('setup-key').value.trim();
+  const pin = getPin('sp');
+  const err = document.getElementById('setup-err');
+  if (!key.startsWith('sk-ant')) { err.textContent = 'API key should start with sk-ant'; return; }
+  if (pin.length !== 4 || !/^\d{4}$/.test(pin)) { err.textContent = 'PIN must be exactly 4 digits'; return; }
+  localStorage.setItem('rh_key', key);
+  localStorage.setItem('rh_pin', btoa(pin));
+  showApp();
+}
+
+function tryUnlock() {
+  const pin = getPin('lp');
+  if (pin.length < 4) return;
+  const stored = atob(localStorage.getItem('rh_pin') || '');
+  if (pin === stored) { showApp(); }
+  else { document.getElementById('lock-err').textContent = 'Incorrect PIN'; ['lp0','lp1','lp2','lp3'].forEach(id=>{const e=document.getElementById(id);if(e)e.value='';}); document.getElementById('lp0').focus(); }
+}
+
+function lockApp() {
+  document.getElementById('app').style.display = 'none';
+  ['lp0','lp1','lp2','lp3'].forEach(id=>{const e=document.getElementById(id);if(e)e.value='';});
+  document.getElementById('lock-err').textContent = '';
+  document.getElementById('screen-lock').style.display = 'block';
+  setTimeout(()=>document.getElementById('lp0').focus(), 100);
+}
+
+function showApp() {
+  document.getElementById('screen-setup').style.display = 'none';
+  document.getElementById('screen-lock').style.display = 'none';
+  document.getElementById('app').style.display = 'flex';
+  loadDemoGraph();
+}
+
+function resetAll() {
+  if (!confirm('Clear all saved data and restart setup?')) return;
+  localStorage.removeItem('rh_key');
+  localStorage.removeItem('rh_pin');
+  location.reload();
+}
+
+function updateKey() {
+  const k = prompt('Enter new Anthropic API key:');
+  if (k && k.startsWith('sk-ant')) { localStorage.setItem('rh_key', k); alert('API key updated.'); }
+  else if (k) { alert('Invalid key format.'); }
+}
+
+function changePin() {
+  const p = prompt('Enter new 4-digit PIN:');
+  if (p && /^\d{4}$/.test(p)) { localStorage.setItem('rh_pin', btoa(p)); alert('PIN updated.'); }
+  else if (p) { alert('PIN must be exactly 4 digits.'); }
+}
+
+function init() {
+  const key = localStorage.getItem('rh_key');
+  const pin = localStorage.getItem('rh_pin');
+  if (!key || !pin) {
+    document.getElementById('screen-setup').style.display = 'block';
+    setTimeout(()=>document.getElementById('setup-key').focus(), 100);
+  } else {
+    document.getElementById('screen-lock').style.display = 'block';
+    setTimeout(()=>document.getElementById('lp0').focus(), 100);
+  }
+}
+
+// ════════════════════════════════
+//  TABS
+// ════════════════════════════════
+function switchTab(id, btn, fromCode) {
+  document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+  document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));
+  if (btn) btn.classList.add('active');
+  else if (fromCode) {
+    document.getElementById('tab-settings').style.display='inline-block';
+    document.getElementById('tab-settings').classList.add('active');
+  }
+  document.getElementById('panel-'+id).classList.add('active');
+}
+
+// ════════════════════════════════
+//  HELPERS
+// ════════════════════════════════
+function toggleTag(el){el.classList.toggle('on')}
+function toggleCT(el){document.querySelectorAll('.ct-opt').forEach(e=>e.classList.remove('on'));el.classList.add('on')}
+function getCT(){const e=document.querySelector('.ct-opt.on');return e?e.textContent.trim():'thematic overlap'}
+function getTags(){return Array.from(document.querySelectorAll('#note-tags .tag-chip.on')).map(e=>e.textContent.trim())}
+function setStatus(id,msg,type){const e=document.getElementById(id);if(!e)return;e.textContent=msg;e.className='status-msg'+(type?' '+type:'')}
+function apiKey(){return localStorage.getItem('rh_key')||''}
+
+async function anthropic(prompt) {
+  const res = await fetch('https://api.anthropic.com/v1/messages',{
+    method:'POST',
+    headers:{'Content-Type':'application/json','x-api-key':apiKey(),'anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true'},
+    body:JSON.stringify({
+      model:'claude-sonnet-4-20250514',
+      max_tokens:1000,
+      mcp_servers:[{type:'url',url:'https://mcp.notion.com/mcp',name:'notion'}],
+      system:'You are a Notion assistant. Execute the requested operation exactly. Reply only "ok" on success or "error: reason" on failure.',
+      messages:[{role:'user',content:prompt}]
+    })
+  });
+  const data = await res.json();
+  if (data.error) throw new Error(data.error.message);
+  return (data.content||[]).filter(b=>b.type==='text').map(b=>b.text).join('');
+}
+
+// ════════════════════════════════
+//  ADD PAPER
+// ════════════════════════════════
+async function fetchArxiv(){
+  const raw=document.getElementById('arxiv-input').value.trim();
+  if(!raw)return;
+  const m=raw.match(/(\d{4}\.\d{4,5}(?:v\d+)?)/);
+  if(!m){setStatus('paper-status','Could not parse arXiv ID — use format 2303.08774','err');return}
+  const id=m[1].replace(/v\d+$/,'');
+  const btn=document.getElementById('fetch-btn');
+  btn.disabled=true;btn.textContent='Fetching...';setStatus('paper-status','');
+
+  // Worker URL — update this after deploying your Cloudflare Worker
+  const WORKER_URL='https://arxiv-proxy.varshitaveda13.workers.dev';
+
+  try{
+    const res=await fetch(`${WORKER_URL}?id=${id}`);
+    if(!res.ok){
+      const err=await res.json().catch(()=>({}));
+      throw new Error(err.error||`Worker returned ${res.status}`);
+    }
+    const d=await res.json();
+    if(d.error)throw new Error(d.error);
+
+    document.getElementById('p-title').value=d.title||'';
+    document.getElementById('p-authors').value=d.authors||'';
+    document.getElementById('p-year').value=d.year||'';
+    document.getElementById('p-url').value=d.url||`https://arxiv.org/abs/${id}`;
+    document.getElementById('p-abstract').value=(d.abstract||'').slice(0,500);
+    document.getElementById('p-source').value='arXiv';
+    document.getElementById('prev-title').textContent=d.title||'';
+    document.getElementById('prev-meta').textContent=(d.authors||'')+(d.year?' · '+d.year:'');
+    document.getElementById('prev-abst').textContent=(d.abstract||'').slice(0,300);
+    document.getElementById('preview').style.display='block';
+    setStatus('paper-status','Metadata fetched — review then save','ok');
+  }catch(e){
+    // Worker not yet deployed? Fall back to Anthropic API
+    try{
+      const res2=await fetch('https://api.anthropic.com/v1/messages',{
+        method:'POST',
+        headers:{'Content-Type':'application/json','x-api-key':apiKey(),'anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true'},
+        body:JSON.stringify({
+          model:'claude-haiku-4-5-20251001',max_tokens:600,
+          system:'You are a paper metadata assistant. Return ONLY a JSON object with keys: title, authors (comma-separated), year (integer), abstract (max 400 chars). If unknown, return {"error":"unknown"}. No markdown, no backticks.',
+          messages:[{role:'user',content:`arXiv ID: ${id}  URL: https://arxiv.org/abs/${id}`}]
+        })
+      });
+      const data=await res2.json();
+      if(data.error)throw new Error(data.error.message);
+      const text=(data.content||[]).filter(b=>b.type==='text').map(b=>b.text).join('').trim();
+      const parsed=JSON.parse(text.replace(/```json|```/g,'').trim());
+      if(parsed.error==='unknown')throw new Error('unknown');
+      document.getElementById('p-title').value=parsed.title||'';
+      document.getElementById('p-authors').value=parsed.authors||'';
+      document.getElementById('p-year').value=parsed.year||'';
+      document.getElementById('p-url').value=`https://arxiv.org/abs/${id}`;
+      document.getElementById('p-abstract').value=(parsed.abstract||'').slice(0,500);
+      document.getElementById('p-source').value='arXiv';
+      document.getElementById('prev-title').textContent=parsed.title||'';
+      document.getElementById('prev-meta').textContent=(parsed.authors||'')+(parsed.year?' · '+parsed.year:'');
+      document.getElementById('prev-abst').textContent=(parsed.abstract||'').slice(0,300);
+      document.getElementById('preview').style.display='block';
+      setStatus('paper-status','Fetched via fallback — deploy Worker for better results','ok');
+    }catch(e2){
+      const msg=e2.message==='unknown'
+        ?'Paper not in training data — fill in manually'
+        :'Fetch failed — deploy the Cloudflare Worker or fill in manually';
+      setStatus('paper-status',msg,'err');
+    }
+  }finally{
+    btn.disabled=false;btn.textContent='Fetch metadata';
+  }
+}
+
+async function savePaper(){
+  const title=document.getElementById('p-title').value.trim();
+  if(!title){setStatus('paper-status','Title is required','err');return}
+  const btn=document.getElementById('save-paper-btn');
+  btn.disabled=true;setStatus('paper-status','Saving...');
+  try{
+    await anthropic(`Create a new page in Notion database collection://12ce506c-f478-4d70-8431-c4833b3c7b46 with: Title="${title}", Authors="${document.getElementById('p-authors').value}", Year=${parseInt(document.getElementById('p-year').value)||'null'}, "DOI / URL"="${document.getElementById('p-url').value}", Source="${document.getElementById('p-source').value}", "Reading Status"="${document.getElementById('p-status').value}", Abstract="${document.getElementById('p-abstract').value.slice(0,500)}"`);
+    setStatus('paper-status','Saved to Papers DB','ok');clearPaper();
+  }catch(e){setStatus('paper-status','Save failed — check API key in Settings','err')}
+  finally{btn.disabled=false}
+}
+
+function clearPaper(){
+  ['p-title','p-authors','p-year','p-url','p-abstract'].forEach(id=>document.getElementById(id).value='');
+  document.getElementById('arxiv-input').value='';
+  document.getElementById('preview').style.display='none';
+  setStatus('paper-status','');
+}
+
+// ════════════════════════════════
+//  ADD NOTE
+// ════════════════════════════════
+async function saveNote(){
+  const title=document.getElementById('n-title').value.trim();
+  if(!title){setStatus('note-status','Title is required','err');return}
+  const btn=document.getElementById('save-note-btn');
+  btn.disabled=true;setStatus('note-status','Saving...');
+  try{
+    const tags=getTags();
+    await anthropic(`Create a new page in Notion database collection://c227422f-28eb-4dfb-bfb8-bc3672aad457 with: "Note Title"="${title}", "Note Type"="${document.getElementById('n-type').value}", Confidence="${document.getElementById('n-conf').value}", "Related Papers"="${document.getElementById('n-papers').value}", "Key Insight"="${document.getElementById('n-insight').value}", Body="${document.getElementById('n-body').value.slice(0,800)}", Tags=${JSON.stringify(tags)}`);
+    setStatus('note-status','Saved to Notes DB','ok');clearNote();
+  }catch(e){setStatus('note-status','Save failed — check API key in Settings','err')}
+  finally{btn.disabled=false}
+}
+
+function clearNote(){
+  ['n-title','n-papers','n-insight','n-body'].forEach(id=>document.getElementById(id).value='');
+  document.querySelectorAll('#note-tags .tag-chip').forEach(c=>c.classList.remove('on'));
+  setStatus('note-status','');
+}
+
+// ════════════════════════════════
+//  ADD CONNECTION
+// ════════════════════════════════
+async function saveConnection(){
+  const a=document.getElementById('c-a').value.trim();
+  const b=document.getElementById('c-b').value.trim();
+  if(!a||!b){setStatus('conn-status','Both papers required','err');return}
+  const btn=document.getElementById('save-conn-btn');
+  btn.disabled=true;setStatus('conn-status','Saving...');
+  try{
+    const ct=getCT();
+    await anthropic(`Create a new page in Notion database collection://2c8b4704-42bd-4f45-afce-0f884be4ce99 with: Connection="${a} → ${b}", "Paper A"="${a}", "Paper B"="${b}", "Connection Type"="${ct}", Strength="${document.getElementById('c-strength').value}", Notes="${document.getElementById('c-notes').value}"`);
+    setStatus('conn-status','Saved to Connections DB','ok');clearConn();
+  }catch(e){setStatus('conn-status','Save failed — check API key in Settings','err')}
+  finally{btn.disabled=false}
+}
+
+function clearConn(){
+  ['c-a','c-b','c-notes'].forEach(id=>document.getElementById(id).value='');
+  setStatus('conn-status','');
+}
+
+// ════════════════════════════════
+//  GRAPH
+// ════════════════════════════════
+const CT_COLORS={
+  'cites':'#3b82f6','cited by':'#8b5cf6','same methodology':'#22c55e',
+  'same dataset':'#f59e0b','contradicts':'#ef4444','extends / builds on':'#f97316',
+  'thematic overlap':'#14b8a6','same authors':'#ec4899'
+};
+const DEMO=[
+  {paperA:'Attention Is All You Need',paperB:'BERT: Pre-training of Deep Bidirectional Transformers',connectionType:'extends / builds on',strength:'Strong',notes:'BERT extends the transformer architecture'},
+  {paperA:'BERT: Pre-training of Deep Bidirectional Transformers',paperB:'GPT-3: Language Models are Few-Shot Learners',connectionType:'same methodology',strength:'Strong',notes:'Both use transformer-based pretraining'},
+  {paperA:'Attention Is All You Need',paperB:'GPT-3: Language Models are Few-Shot Learners',connectionType:'cites',strength:'Strong',notes:'GPT-3 cites original transformer'},
+  {paperA:'GPT-3: Language Models are Few-Shot Learners',paperB:'Chain-of-Thought Prompting',connectionType:'extends / builds on',strength:'Strong',notes:'CoT builds on GPT-3 few-shot'},
+  {paperA:'BERT: Pre-training of Deep Bidirectional Transformers',paperB:'RoBERTa: Robustly Optimized BERT',connectionType:'extends / builds on',strength:'Strong',notes:'RoBERTa improves BERT pretraining'},
+  {paperA:'Chain-of-Thought Prompting',paperB:'Self-Consistency Improves CoT Reasoning',connectionType:'cited by',strength:'Strong',notes:'Self-consistency builds on CoT'},
+  {paperA:'CLIP: Learning Transferable Visual Models',paperB:'Attention Is All You Need',connectionType:'cites',strength:'Moderate',notes:'CLIP uses transformer architecture'},
+  {paperA:'CLIP: Learning Transferable Visual Models',paperB:'BERT: Pre-training of Deep Bidirectional Transformers',connectionType:'same methodology',strength:'Weak',notes:'Both use contrastive-style pretraining'},
+  {paperA:'GPT-3: Language Models are Few-Shot Learners',paperB:'Self-Consistency Improves CoT Reasoning',connectionType:'same methodology',strength:'Moderate',notes:'Both use LLM inference'},
+];
+
+let allConns=[];
+let activeTypes=new Set(Object.keys(CT_COLORS));
+let activeStrengths=new Set(['Strong','Moderate','Weak']);
+let sim;
+
+function buildPills(){
+  const c=document.getElementById('ct-pills');
+  c.innerHTML='';
+  Object.entries(CT_COLORS).forEach(([type,col])=>{
+    const el=document.createElement('span');
+    el.className='pill';el.dataset.type=type;
+    el.style.cssText=`background:${col}18;border-color:${col}55;color:${col}`;
+    el.innerHTML=`<span style="width:7px;height:7px;border-radius:50%;background:${col};display:inline-block"></span>${type}`;
+    el.onclick=()=>{
+      if(activeTypes.has(type)){activeTypes.delete(type);el.classList.add('off');}
+      else{activeTypes.add(type);el.classList.remove('off');}
+      renderGraph();
+    };
+    c.appendChild(el);
+  });
+}
+
+function toggleStrength(btn,val){
+  if(activeStrengths.has(val)){activeStrengths.delete(val);btn.classList.remove('on');}
+  else{activeStrengths.add(val);btn.classList.add('on');}
+  renderGraph();
+}
+
+function loadDemoGraph(){allConns=DEMO;buildPills();renderGraph();setStatus('graph-status',`Demo: ${DEMO.length} connections`);}
+
+async function syncGraph(){
+  const btn=document.getElementById('sync-btn');
+  btn.disabled=true;setStatus('graph-status','Fetching from Notion...');
+  try{
+    const body={
+      model:'claude-sonnet-4-20250514',max_tokens:1000,
+      mcp_servers:[{type:'url',url:'https://mcp.notion.com/mcp',name:'notion'}],
+      system:'You are a data retrieval assistant. Return ONLY valid JSON array, no markdown, no explanation, no backticks.',
+      messages:[{role:'user',content:'Fetch all pages from Notion database collection://2c8b4704-42bd-4f45-afce-0f884be4ce99. Return a JSON array where each item has keys: paperA (Paper A field), paperB (Paper B field), connectionType (Connection Type field), strength (Strength field), notes (Notes field). Return [] if empty.'}]
+    };
+    const res=await fetch('https://api.anthropic.com/v1/messages',{
+      method:'POST',
+      headers:{'Content-Type':'application/json','x-api-key':apiKey(),'anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true'},
+      body:JSON.stringify(body)
+    });
+    const data=await res.json();
+    const text=(data.content||[]).filter(b=>b.type==='text').map(b=>b.text).join('');
+    const parsed=JSON.parse(text.replace(/```json|```/g,'').trim());
+    if(parsed.length===0){setStatus('graph-status','DB empty — showing demo');loadDemoGraph();return;}
+    allConns=parsed;buildPills();renderGraph();
+    setStatus('graph-status',`${parsed.length} connection${parsed.length!==1?'s':''} loaded`,'ok');
+  }catch(e){setStatus('graph-status','Fetch failed — showing demo','err');loadDemoGraph();}
+  finally{btn.disabled=false;}
+}
+
+function clamp(v,lo,hi){return Math.max(lo,Math.min(hi,v))}
+
+function renderGraph(){
+  const filtered=allConns.filter(c=>activeTypes.has(c.connectionType)&&activeStrengths.has(c.strength));
+  const box=document.getElementById('graph-box');
+  const W=box.clientWidth||680,H=460;
+  const nodeMap=new Map();
+  filtered.forEach(c=>{
+    if(!nodeMap.has(c.paperA))nodeMap.set(c.paperA,{id:c.paperA,degree:0});
+    if(!nodeMap.has(c.paperB))nodeMap.set(c.paperB,{id:c.paperB,degree:0});
+    nodeMap.get(c.paperA).degree++;nodeMap.get(c.paperB).degree++;
+  });
+  const nodes=Array.from(nodeMap.values());
+  const links=filtered.map(c=>({source:c.paperA,target:c.paperB,type:c.connectionType,strength:c.strength,notes:c.notes}));
+  document.getElementById('empty-graph').style.display=nodes.length===0?'flex':'none';
+  document.getElementById('g-links').innerHTML='';
+  document.getElementById('g-nodes').innerHTML='';
+  if(nodes.length===0)return;
+  if(sim)sim.stop();
+  const maxDeg=d3.max(nodes,d=>d.degree)||1;
+  const r=d=>8+(d.degree/maxDeg)*14;
+  const svg=d3.select('#graph-svg');
+  const gL=d3.select('#g-links');
+  const gN=d3.select('#g-nodes');
+  sim=d3.forceSimulation(nodes)
+    .force('link',d3.forceLink(links).id(d=>d.id).distance(115).strength(0.5))
+    .force('charge',d3.forceManyBody().strength(-200))
+    .force('center',d3.forceCenter(W/2,H/2))
+    .force('collide',d3.forceCollide().radius(d=>r(d)+22));
+  const link=gL.selectAll('line').data(links).enter().append('line')
+    .attr('stroke',d=>CT_COLORS[d.type]||'#888')
+    .attr('stroke-width',d=>d.strength==='Strong'?2.5:d.strength==='Moderate'?1.5:0.8)
+    .attr('stroke-opacity',d=>d.strength==='Weak'?.4:.7)
+    .attr('marker-end','url(#arr)');
+  const node=gN.selectAll('g').data(nodes).enter().append('g').style('cursor','pointer')
+    .call(d3.drag()
+      .on('start',(e,d)=>{if(!e.active)sim.alphaTarget(0.3).restart();d.fx=d.x;d.fy=d.y;})
+      .on('drag',(e,d)=>{d.fx=e.x;d.fy=e.y;})
+      .on('end',(e,d)=>{if(!e.active)sim.alphaTarget(0);d.fx=null;d.fy=null;})
+    )
+    .on('click',(e,d)=>selectNode(d,links));
+  node.append('circle').attr('r',r).attr('fill','#dbeafe').attr('stroke','#3b82f6').attr('stroke-width',1.5);
+  node.append('text')
+    .text(d=>d.id.length>24?d.id.slice(0,24)+'…':d.id)
+    .attr('text-anchor','middle').attr('dy',d=>r(d)+13)
+    .attr('font-size','11px').attr('fill','var(--text2)')
+    .style('pointer-events','none');
+  sim.on('tick',()=>{
+    link
+      .attr('x1',d=>clamp(d.source.x,16,W-16))
+      .attr('y1',d=>clamp(d.source.y,16,H-16))
+      .attr('x2',d=>{const dx=d.target.x-d.source.x,dy=d.target.y-d.source.y,dist=Math.sqrt(dx*dx+dy*dy)||1,tr=r(d.target)+4;return clamp(d.target.x-(dx/dist)*tr,16,W-16);})
+      .attr('y2',d=>{const dx=d.target.x-d.source.x,dy=d.target.y-d.source.y,dist=Math.sqrt(dx*dx+dy*dy)||1,tr=r(d.target)+4;return clamp(d.target.y-(dy/dist)*tr,16,H-16);});
+    node.attr('transform',d=>`translate(${clamp(d.x,16,W-16)},${clamp(d.y,16,H-16)})`);
+  });
+}
+
+function selectNode(d,links){
+  const conns=links.filter(l=>l.source.id===d.id||l.target.id===d.id);
+  const chips=conns.map(l=>{
+    const other=l.source.id===d.id?l.target.id:l.source.id;
+    const col=CT_COLORS[l.type]||'#888';
+    return `<span class="conn-chip" style="border-color:${col}30;background:${col}10;color:var(--text2)"><span style="display:inline-block;width:6px;height:6px;border-radius:50%;background:${col};margin-right:4px;vertical-align:middle"></span>${l.type} → ${other.length>32?other.slice(0,32)+'…':other}</span>`;
+  }).join('');
+  document.getElementById('graph-info').innerHTML=`<h3>${d.id.length>70?d.id.slice(0,70)+'…':d.id}</h3><p>${conns.length} connection${conns.length!==1?'s':''} · degree ${d.degree}</p><div class="conn-chips">${chips||'<span style="color:var(--text3);font-size:12px">No connections with current filters</span>'}</div>`;
+  d3.selectAll('#g-nodes circle')
+    .attr('fill',n=>n.id===d.id?'#3b82f6':conns.some(l=>l.source.id===n.id||l.target.id===n.id)?'#93c5fd':'#dbeafe')
+    .attr('stroke-width',n=>n.id===d.id?2.5:1.5);
+  d3.selectAll('#g-links line')
+    .attr('stroke-opacity',l=>(l.source.id===d.id||l.target.id===d.id)?1:0.07);
+}
+
+// ════════════════════════════════
+//  BOOT
+// ════════════════════════════════
+init();
+</script>
+</body>
+</html>
