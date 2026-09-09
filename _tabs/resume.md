@@ -4,8 +4,7 @@ icon: fas fa-info-circle
 order: 1
 ---
 
-> Add Markdown syntax content to file `_tabs/resume.md`{: .filepath } and it will show up on this page.
-{: .prompt-tip }
+[**Download CV (PDF)**](/assets/Vedavarshita_Nunna_Resume.pdf){: target="_blank" }
 
 # Education
 
@@ -19,10 +18,15 @@ _Lovely Professional University_ Punjab, India **Bachelor of Technology, Electro
 
 # Experience
 
-**AI/ML Research Assistant** **_CODED Lab**, Drexel University_ | Advisor: Dr. Jake Williams | PyTorch, LLM | Philadelphia, PA | July 2024 – present
-- Expanded a novel Bayesian inspired neural network initialization algorithm leveraging co-occurrence and Product Quantization, improving pre-gradient update accuracy from ≈10% (random) to 65–74% on CIFAR-10 and MNIST
-- Validated the approach through weight evolution analysis, showing 76% cosine similarity between initialized and fully trained kernels, demonstrating its effectiveness as an informative warm-start for neural networks
-- Integrated RLHF with 1.5B parameter Language Model via preference-based fine-tuning with DPO and adaptive training, improving performance by 17% and reducing perplexity from 31.64 to 25.42 on HHH dataset
+**Gen AI Researcher – Contract** **_BioNTech_** | Python, Databricks | Berkeley Heights, NJ | Jan 2026 – present
+- Designed a query-adaptive retrieval fusion strategy for an agentic RAG + knowledge graph system over a 3,285-document oncology corpus, dynamically weighting vector, graph, and keyword signals based on inferred query intent to handle heterogeneous unstructured biomedical data
+- Developed a two-pass LLM entity extraction pipeline with windowed cross-chunk deduplication and content-addressed entity identity (18.5K entities, 82K+ edges on Amazon Neptune), enabling idempotent, replayable knowledge graph construction at corpus scale
+- Evaluated infrastructure tradeoffs (Neptune over ArangoDB, custom async orchestration over LangGraph) under production constraints; reduced full-corpus LLM reprocessing cost by 98% ($15K → $300) via prompt-version-aware extraction caching with automated cross-store integrity verification (Postgres, Databricks Delta, Neptune)
+
+**AI/ML Research Assistant** **_CODED Lab**, Drexel University_ | Advisor: Dr. Jake Williams | PyTorch, LLM | Philadelphia, PA | July 2024 – Dec 2025
+- Expanded a novel Bayesian inspired neural network initialization algorithm leveraging co-occurrence and Product Quantization, improving pre-gradient update accuracy from ≈10% (random) to 74% on MNIST and 65% on CIFAR-10
+- Validated the approach through weight evolution analysis, showing 75% cosine similarity between initialized and fully trained kernels, demonstrating its effectiveness as an informative warm-start for neural networks
+- Integrated RLHF with 1.5B parameter Language Model via preference-based fine-tuning with DPO and adaptive training, improving performance by 17% and reducing perplexity by 20% (31.64 to 25.42) on the HHH dataset
 
 **Associate Software Engineer** _Location Intelligence R&D dept._ | **PRECISELY** | Python, SQL | Bangalore, India | July 2022 – June 2023 
 - Enhanced Geocoded Master Location Data pipeline, expanding coverage to Sweden and France while optimizing data processing for 1M+ geographic locations
@@ -44,9 +48,9 @@ _Lovely Professional University_ Punjab, India **Bachelor of Technology, Electro
 - Optimized RAG performance using DSPy prompt learning and MMR retrieval strategy, improving answer relevance by 27% and reducing generation latency to 1.06s while maintaining 76% quality scores across 37 test queries
 
 **Synthetic Text Data Generation Pipeline with LoRA** | [Link](https://github.com/VedaVarshita/Synthetic-text-data-generation) | PyTorch, LoRA | June 2025 – July 2025
-- Designed and implemented an end-to-end machine learning data pipeline (ingest, validation, cleaning, monitoring) for synthetic text generation across AG News and IMDB datasets, enabling zero, one, and few-shot text generation
+- Designed and implemented an end-to-end, 4-stage machine learning data pipeline (ingest, validation, cleaning, monitoring) for synthetic text generation across AG News and IMDB datasets, enabling zero-shot, one-shot, few-shot, and LoRA fine-tuned text generation
 - Orchestrated workflows with Prefect, containerized with Docker + CI/CD, and exposed the pipeline through RESTful APIs (FastAPI) for integration into downstream systems
-- Integrated logging using MLflow and monitoring to track generation quality and diversity (ROUGE-L, Self-BLEU, N-gram div.), ensuring continuous evaluation and reproducibility across 10+ tunable hyperparameters
+- Integrated logging using MLflow and monitoring to track generation quality and diversity (ROUGE-L, Self-BLEU, VendiScore, N-gram div.), reducing perplexity by 10–15× while ensuring continuous evaluation and reproducibility across 10+ tunable hyperparameters
 
 
 
@@ -56,11 +60,11 @@ _Lovely Professional University_ Punjab, India **Bachelor of Technology, Electro
 
 # Technical Skills
 
-**Programming & Dev Tools**: Python, C/C++, Java, NumPy, Pandas, SQL, Git, Docker, Spark, AWS, Azure, Jira
+**Programming & Dev Tools**: Python, C/C++, Java, NumPy, Pandas, SQL, Git, Docker, Spark, Databricks, AWS, Azure, Jira
 
-**ML/AI Tools**: Scikit-Learn, PyTorch, TensorFlow, OpenCV, LlamaIndex, HuggingFace, LangChain, ONNX, MLflow
+**ML/AI Tools**: Scikit-Learn, PyTorch, TensorFlow, OpenCV, LlamaIndex, HuggingFace, LangChain, ONNX, MLflow, Amazon Neptune, Knowledge Graphs
 
-**LLMs & Gen AI**: Models (LLaMA, Mistral, OpenAI, Deepseek), LoRA, Finetuning, RAG, FAISS, Pinecone
+**LLMs & Gen AI**: Models (LLaMA, Mistral, OpenAI, Deepseek), SLMs, Multi-modal Models, LoRA, Finetuning, RAG, Prompt Engineering, Statistical Modeling, FAISS, Pinecone
 
 **Core competencies**: Probability, Statistics, Exploratory Data Analysis, Data Visualization, Unsupervised Learning, Reinforcement Learning, Deep Learning, Computer Vision, Natural Language Processing
 
