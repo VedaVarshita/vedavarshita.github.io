@@ -1,10 +1,17 @@
 ---
 # the default layout is 'page'
-icon: fas fa-info-circle
+icon: fas fa-file-lines
 order: 1
 ---
 
 [**Download CV (PDF)**](/assets/Vedavarshita_Nunna_Resume.pdf){: target="_blank" }
+
+# Highlights
+
+- **≈10% → 74%** pre-gradient-update accuracy on MNIST (65% on CIFAR-10) via a novel Bayesian-inspired initialization
+- **−20% perplexity** (31.64 → 25.42) and **+17%** task performance aligning a 1.5B-parameter LM with DPO/RLHF
+- **86% MRR** semantic retrieval over 30+ ML papers; **94%** query success with DSPy-optimized RAG
+- **98% cost reduction** ($15K → $300) on corpus-scale LLM reprocessing at BioNTech
 
 # Education
 
