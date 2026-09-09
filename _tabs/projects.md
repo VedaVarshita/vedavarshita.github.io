@@ -41,12 +41,6 @@ A 4-stage synthetic-data pipeline (zero / one / few-shot + LoRA fine-tuning) wit
 - Perplexity reduced **10–15×**, validated with ROUGE-L, Self-BLEU, and VendiScore
 - Reproducible across 10+ tunable hyperparameters; trains adapter weights only
 
-**Research Hub** | arXiv & Semantic Scholar APIs · Cloudflare Workers
-
-[Open the tool](/research-hub/)
-
-A literature-management tool I built for my own workflow — fetches papers from arXiv and Semantic Scholar and organizes them into a structured knowledge base.
-
 **Air Quality Forecasting** | Python · statsmodels · ARIMA / SARIMA
 
 [Writeup](/posts/predictive-modeling-daily-air-quality-time-series/) · [Code](https://github.com/VedaVarshita/Predictive-Modeling-of-Daily-Air-Quality-Using-Time-Series)
