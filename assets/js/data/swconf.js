@@ -1,1 +1,1 @@
-const swconf = { cacheName: 'chirpy-1792102471',resources: [ '/assets/css/jekyll-theme-chirpy.css', '/', '/resume/', '/about/', '/projects/', '/categories/', '/tags/', '/archives/', ], interceptor: {paths: [ ],urlPrefixes: [ ] }, purge: false };
+const swconf = { cacheName: 'chirpy-1792103162',resources: [ '/assets/css/jekyll-theme-chirpy.css', '/', '/resume/', '/about/', '/projects/', '/categories/', '/tags/', '/archives/', ], interceptor: {paths: [ ],urlPrefixes: [ 'https://vedavarshita.goatcounter.com/counter/' ] }, purge: false };
