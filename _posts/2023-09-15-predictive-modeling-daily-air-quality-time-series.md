@@ -3,6 +3,9 @@ title: "Predictive Modeling of Daily Air Quality Using Time Series"
 date: 2023-09-15
 categories: [Projects, Machine Learning, Time Series]
 tags: [python, statistics, time-series, forecasting, air-quality, data-analysis]
+image:
+  path: /assets/Images/air_quality_pipeline.png
+  alt: "Forecasting pipeline: rolling-stats/ADF/ACF diagnostics, moving-average and exponential smoothing, ARIMA/SARIMA/state-space forecasting models"
 ---
 <!-- 
 ## Overview

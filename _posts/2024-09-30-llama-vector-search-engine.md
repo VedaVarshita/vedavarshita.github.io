@@ -3,6 +3,9 @@ title: "LLaMA Vector Search Engine"
 date: 2024-09-30
 categories: [Projects, Machine Learning, NLP]
 tags: [llama, langchain, rag, faiss, vector-search, semantic-search, nlp]
+image:
+  path: /assets/Images/rag_proj.png
+  alt: "System architecture: document processing into FAISS, three retrieval modes (standard, LangGraph, DSPy), MMR retrieval, LLaMA 3.2 generation, Gradio UI"
 ---
 
 <!--  -->

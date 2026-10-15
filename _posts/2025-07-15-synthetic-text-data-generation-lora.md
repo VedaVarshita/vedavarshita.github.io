@@ -3,6 +3,9 @@ title: "Synthetic Text Data Generation Pipeline with LoRA"
 date: 2025-07-15
 categories: [Projects, Machine Learning]
 tags: [pytorch, lora, llm, synthetic-data, mlflow, fastapi, docker, prefect]
+image:
+  path: /assets/Images/synthetic_text_pipeline.png
+  alt: "4-stage pipeline: data generation (zero/one/few-shot + LoRA fine-tune), orchestration with Prefect/Docker/FastAPI, evaluation with ROUGE-L/Self-BLEU/VendiScore"
 ---
 
 ## Overview

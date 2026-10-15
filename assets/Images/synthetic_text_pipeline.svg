@@ -1,0 +1,28 @@
+<svg width="1200" height="630" viewBox="0 0 1200 630" xmlns="http://www.w3.org/2000/svg" font-family="Courier New, monospace">
+  <rect width="1200" height="630" fill="#151b23"/>
+
+  <text x="40" y="55" font-size="24" letter-spacing="3" fill="#58a6ff" font-weight="700">SYNTHETIC TEXT DATA GENERATION PIPELINE</text>
+
+  <!-- Box 1 -->
+  <rect x="40" y="85" width="1120" height="150" fill="none" stroke="#e6edf3" stroke-width="2"/>
+  <text x="600" y="130" text-anchor="middle" font-size="28" fill="#e6edf3" font-weight="700">Data Generation</text>
+  <line x1="60" y1="150" x2="1140" y2="150" stroke="#e6edf3" stroke-width="1.5"/>
+  <text x="600" y="200" text-anchor="middle" font-size="23" fill="#c9d1d9">AG News · IMDB  →  zero-shot → one-shot → few-shot → LoRA fine-tune</text>
+
+  <text x="600" y="268" text-anchor="middle" font-size="26" fill="#58a6ff">&#8595;</text>
+
+  <!-- Box 2 -->
+  <rect x="40" y="285" width="1120" height="110" fill="none" stroke="#e6edf3" stroke-width="2"/>
+  <text x="600" y="325" text-anchor="middle" font-size="28" fill="#e6edf3" font-weight="700">Orchestration &amp; Serving</text>
+  <line x1="60" y1="345" x2="1140" y2="345" stroke="#e6edf3" stroke-width="1.5"/>
+  <text x="600" y="378" text-anchor="middle" font-size="23" fill="#c9d1d9">Prefect  →  Docker  →  FastAPI</text>
+
+  <text x="600" y="428" text-anchor="middle" font-size="26" fill="#58a6ff">&#8595;</text>
+
+  <!-- Box 3 -->
+  <rect x="40" y="445" width="1120" height="140" fill="none" stroke="#e6edf3" stroke-width="2"/>
+  <text x="600" y="485" text-anchor="middle" font-size="28" fill="#e6edf3" font-weight="700">Evaluation</text>
+  <line x1="60" y1="505" x2="1140" y2="505" stroke="#e6edf3" stroke-width="1.5"/>
+  <text x="600" y="540" text-anchor="middle" font-size="23" fill="#c9d1d9">ROUGE-L   Self-BLEU   VendiScore</text>
+  <text x="600" y="568" text-anchor="middle" font-size="23" fill="#c9d1d9">perplexity reduced 10–15×  ·  10+ tunable hyperparameters</text>
+</svg>
