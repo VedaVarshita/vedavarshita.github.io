@@ -93,6 +93,8 @@ textarea.fi{resize:vertical;min-height:88px;line-height:1.5}
 .picker-row:last-child{border-bottom:none}
 .picker-info{flex:1;min-width:0}
 .picker-title{font-size:13px;font-weight:500;line-height:1.4}
+a.picker-title{color:inherit;text-decoration:none;display:inline-block}
+a.picker-title:hover{text-decoration:underline;color:var(--blue)}
 .picker-meta{font-size:12px;color:var(--text2);margin-top:2px}
 .picker-btns{display:flex;gap:6px;flex-shrink:0}
 
@@ -742,6 +744,14 @@ function updatePreviewActions(){
   document.getElementById('preview-actions').style.display=currentS2Id?'block':'none';
 }
 
+function paperUrl(paper){
+  const ext=paper.externalIds||{};
+  if(ext.DOI)return 'https://doi.org/'+ext.DOI;
+  if(ext.ArXiv)return 'https://arxiv.org/abs/'+ext.ArXiv;
+  if(paper.paperId)return 'https://www.semanticscholar.org/paper/'+paper.paperId;
+  if(paper.url)return paper.url;
+  return null;
+}
 function renderPickerList(container, papers, actions){
   container.innerHTML='';
   container.style.display='block';
@@ -757,9 +767,11 @@ function renderPickerList(container, papers, actions){
     row.className='picker-row';
     const info=document.createElement('div');
     info.className='picker-info';
-    const titleEl=document.createElement('div');
+    const url=paperUrl(paper);
+    const titleEl=document.createElement(url?'a':'div');
     titleEl.className='picker-title';
     titleEl.textContent=paper.title||'(untitled)';
+    if(url){titleEl.href=url;titleEl.target='_blank';titleEl.rel='noopener noreferrer';titleEl.title='Open paper in a new tab';}
     const authors=(paper.authors||[]).map(a=>a.name).join(', ');
     const metaEl=document.createElement('div');
     metaEl.className='picker-meta';
