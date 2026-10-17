@@ -85,6 +85,16 @@ textarea.fi{resize:vertical;min-height:88px;line-height:1.5}
 #preview h4{font-size:14px;font-weight:500;margin-bottom:4px;line-height:1.4}
 #preview .pmeta{font-size:12px;color:var(--text2);margin-bottom:6px}
 #preview .pabst{font-size:12px;color:var(--text2);line-height:1.6;max-height:72px;overflow:hidden}
+#preview-actions{margin-top:10px;padding-top:10px;border-top:1px solid var(--border)}
+
+/* picker lists (Semantic Scholar search / related papers) */
+#s2-results,#related-results{display:none;margin-top:6px;margin-bottom:6px;max-height:280px;overflow-y:auto;border:1px solid var(--border);border-radius:var(--radius);padding:0 10px}
+.picker-row{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:10px 0;border-bottom:1px solid var(--border)}
+.picker-row:last-child{border-bottom:none}
+.picker-info{flex:1;min-width:0}
+.picker-title{font-size:13px;font-weight:500;line-height:1.4}
+.picker-meta{font-size:12px;color:var(--text2);margin-top:2px}
+.picker-btns{display:flex;gap:6px;flex-shrink:0}
 
 /* tags & CT grid */
 .tag-row{display:flex;flex-wrap:wrap;gap:6px;margin-top:6px}
@@ -133,13 +143,17 @@ textarea.fi{resize:vertical;min-height:88px;line-height:1.5}
       <p>Enter your Anthropic API key to get started. It's stored only in your browser's localStorage and never sent anywhere except the Anthropic API.</p>
 
       <div class="steps">
-        1. Get your key at <a href="https://console.anthropic.com/settings/keys" target="_blank">console.anthropic.com</a><br>
-        2. Make sure your Notion integration is connected<br>
-        3. Set a PIN — this is your only login step on return visits
+        1. Get your Anthropic key at <a href="https://console.anthropic.com/settings/keys" target="_blank">console.anthropic.com</a><br>
+        2. Create a Notion integration at <a href="https://www.notion.so/profile/integrations" target="_blank">notion.so/profile/integrations</a> and copy the <code>ntn_…</code> secret<br>
+        3. Connect the integration to your databases in Notion<br>
+        4. Set a PIN — this is your only login step on return visits
       </div>
 
       <label class="fl">Anthropic API key</label>
       <input class="fi" id="setup-key" type="password" placeholder="sk-ant-api03-..." autocomplete="off"/>
+
+      <label class="fl">Notion integration secret</label>
+      <input class="fi" id="setup-notion" type="password" placeholder="ntn_..." autocomplete="off"/>
 
       <label class="fl">Set a 4-digit PIN (for future logins)</label>
       <div class="pin-row">
@@ -189,10 +203,10 @@ textarea.fi{resize:vertical;min-height:88px;line-height:1.5}
   </div>
 
   <div class="tabs">
-    <button class="tab active" onclick="switchTab('paper',this)">Add paper</button>
-    <button class="tab" onclick="switchTab('note',this)">Add note</button>
-    <button class="tab" onclick="switchTab('conn',this)">Add connection</button>
-    <button class="tab" onclick="switchTab('graph',this)">Graph view</button>
+    <button class="tab active" id="tab-paper" onclick="switchTab('paper',this)">Add paper</button>
+    <button class="tab" id="tab-note" onclick="switchTab('note',this)">Add note</button>
+    <button class="tab" id="tab-conn" onclick="switchTab('conn',this)">Add connection</button>
+    <button class="tab" id="tab-graph" onclick="switchTab('graph',this)">Graph view</button>
     <button class="tab" id="tab-settings" style="display:none" onclick="switchTab('settings',this)">Settings</button>
   </div>
 
@@ -200,6 +214,15 @@ textarea.fi{resize:vertical;min-height:88px;line-height:1.5}
 
     <!-- ── ADD PAPER ── -->
     <div id="panel-paper" class="panel active">
+      <label class="fl">Search papers (Semantic Scholar)</label>
+      <div style="display:flex;gap:8px">
+        <input class="fi" id="s2-query" placeholder="Title, author, or keywords" style="flex:1" onkeydown="if(event.key==='Enter')searchSemanticScholar()"/>
+        <button class="save-btn" id="s2-search-btn" onclick="searchSemanticScholar()" style="white-space:nowrap">Search</button>
+      </div>
+      <div id="s2-results"></div>
+      <span class="status-msg" id="s2-status"></span>
+      <div class="divider"></div>
+
       <label class="fl">arXiv URL or ID</label>
       <div style="display:flex;gap:8px">
         <input class="fi" id="arxiv-input" placeholder="https://arxiv.org/abs/2303.08774  or  2303.08774" style="flex:1"/>
@@ -209,7 +232,11 @@ textarea.fi{resize:vertical;min-height:88px;line-height:1.5}
         <h4 id="prev-title"></h4>
         <div class="pmeta" id="prev-meta"></div>
         <div class="pabst" id="prev-abst"></div>
+        <div id="preview-actions" style="display:none">
+          <button class="s-btn" id="find-related-btn" onclick="findRelated()">Find related papers</button>
+        </div>
       </div>
+      <div id="related-results"></div>
       <div class="divider"></div>
       <p style="font-size:12px;color:var(--text3);margin-bottom:10px">Or enter manually:</p>
       <label class="fl">Paper title</label>
@@ -239,6 +266,7 @@ textarea.fi{resize:vertical;min-height:88px;line-height:1.5}
       <textarea class="fi" id="p-abstract" placeholder="Paste abstract or write a brief summary..."></textarea>
       <div class="action-row">
         <button class="save-btn" id="save-paper-btn" onclick="savePaper()">Save to Notion</button>
+        <button class="clear-btn" id="send-zotero-btn" onclick="sendToZotero()">Send to Zotero</button>
         <button class="clear-btn" onclick="clearPaper()">Clear</button>
         <span class="status-msg" id="paper-status"></span>
       </div>
@@ -396,6 +424,34 @@ textarea.fi{resize:vertical;min-height:88px;line-height:1.5}
       </div>
       <div class="setting-row">
         <div>
+          <div class="setting-label">Update Notion integration secret</div>
+          <div class="setting-desc">The <code>ntn_…</code> secret from your Notion integration</div>
+        </div>
+        <button class="setting-action" onclick="updateNotionToken()">Update</button>
+      </div>
+      <div class="setting-row">
+        <div>
+          <div class="setting-label">Semantic Scholar API key (optional)</div>
+          <div class="setting-desc">Raises the free search rate limit — get one at <a href="https://www.semanticscholar.org/product/api" target="_blank">semanticscholar.org/product/api</a></div>
+        </div>
+        <button class="setting-action" onclick="updateS2Key()">Update</button>
+      </div>
+      <div class="setting-row">
+        <div>
+          <div class="setting-label">Zotero User ID</div>
+          <div class="setting-desc">Your numeric Zotero user ID — find it at <a href="https://www.zotero.org/settings/keys" target="_blank">zotero.org/settings/keys</a></div>
+        </div>
+        <button class="setting-action" onclick="updateZoteroUserId()">Update</button>
+      </div>
+      <div class="setting-row">
+        <div>
+          <div class="setting-label">Zotero API key</div>
+          <div class="setting-desc">Needs write access — create one at <a href="https://www.zotero.org/settings/keys" target="_blank">zotero.org/settings/keys</a></div>
+        </div>
+        <button class="setting-action" onclick="updateZoteroKey()">Update</button>
+      </div>
+      <div class="setting-row">
+        <div>
           <div class="setting-label">Change PIN</div>
           <div class="setting-desc">Set a new 4-digit PIN</div>
         </div>
@@ -432,11 +488,14 @@ function getPin(prefix) {
 
 function completeSetup() {
   const key = document.getElementById('setup-key').value.trim();
+  const notion = document.getElementById('setup-notion').value.trim();
   const pin = getPin('sp');
   const err = document.getElementById('setup-err');
   if (!key.startsWith('sk-ant')) { err.textContent = 'API key should start with sk-ant'; return; }
+  if (!notion) { err.textContent = 'Notion integration secret is required'; return; }
   if (pin.length !== 4 || !/^\d{4}$/.test(pin)) { err.textContent = 'PIN must be exactly 4 digits'; return; }
   localStorage.setItem('rh_key', key);
+  localStorage.setItem('rh_notion', notion);
   localStorage.setItem('rh_pin', btoa(pin));
   showApp();
 }
@@ -467,6 +526,7 @@ function showApp() {
 function resetAll() {
   if (!confirm('Clear all saved data and restart setup?')) return;
   localStorage.removeItem('rh_key');
+  localStorage.removeItem('rh_notion');
   localStorage.removeItem('rh_pin');
   location.reload();
 }
@@ -475,6 +535,26 @@ function updateKey() {
   const k = prompt('Enter new Anthropic API key:');
   if (k && k.startsWith('sk-ant')) { localStorage.setItem('rh_key', k); alert('API key updated.'); }
   else if (k) { alert('Invalid key format.'); }
+}
+
+function updateNotionToken() {
+  const t = prompt('Enter Notion integration secret (ntn_… or secret_…):');
+  if (t && t.trim()) { localStorage.setItem('rh_notion', t.trim()); alert('Notion token updated.'); }
+}
+
+function updateS2Key() {
+  const k = prompt('Enter your Semantic Scholar API key (optional — leave blank to clear):');
+  if (k !== null) { localStorage.setItem('rh_s2key', k.trim()); alert(k.trim() ? 'Semantic Scholar key updated.' : 'Semantic Scholar key cleared.'); }
+}
+
+function updateZoteroUserId() {
+  const v = prompt('Enter your Zotero numeric User ID (zotero.org/settings/keys):');
+  if (v && v.trim()) { localStorage.setItem('rh_zot_uid', v.trim()); alert('Zotero User ID updated.'); }
+}
+
+function updateZoteroKey() {
+  const v = prompt('Enter your Zotero API key (needs write access):');
+  if (v && v.trim()) { localStorage.setItem('rh_zot_key', v.trim()); alert('Zotero API key updated.'); }
 }
 
 function changePin() {
@@ -503,8 +583,8 @@ function switchTab(id, btn, fromCode) {
   document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));
   if (btn) btn.classList.add('active');
   else if (fromCode) {
-    document.getElementById('tab-settings').style.display='inline-block';
-    document.getElementById('tab-settings').classList.add('active');
+    const tabBtn=document.getElementById('tab-'+id);
+    if (tabBtn) { tabBtn.style.display='inline-block'; tabBtn.classList.add('active'); }
   }
   document.getElementById('panel-'+id).classList.add('active');
 }
@@ -518,6 +598,11 @@ function getCT(){const e=document.querySelector('.ct-opt.on');return e?e.textCon
 function getTags(){return Array.from(document.querySelectorAll('#note-tags .tag-chip.on')).map(e=>e.textContent.trim())}
 function setStatus(id,msg,type){const e=document.getElementById(id);if(!e)return;e.textContent=msg;e.className='status-msg'+(type?' '+type:'')}
 function apiKey(){return localStorage.getItem('rh_key')||''}
+function notionToken(){return localStorage.getItem('rh_notion')||''}
+function s2Key(){return localStorage.getItem('rh_s2key')||''}
+function s2Headers(){return s2Key()?{'x-api-key':s2Key()}:{}}
+function zoteroUserId(){return localStorage.getItem('rh_zot_uid')||''}
+function zoteroKey(){return localStorage.getItem('rh_zot_key')||''}
 
 async function anthropic(prompt) {
   const res = await fetch('https://api.anthropic.com/v1/messages',{
@@ -526,7 +611,7 @@ async function anthropic(prompt) {
     body:JSON.stringify({
       model:'claude-sonnet-4-20250514',
       max_tokens:1000,
-      mcp_servers:[{type:'url',url:'https://mcp.notion.com/mcp',name:'notion'}],
+      mcp_servers:[{type:'url',url:'https://mcp.notion.com/mcp',name:'notion',authorization_token:notionToken()}],
       system:'You are a Notion assistant. Execute the requested operation exactly. Reply only "ok" on success or "error: reason" on failure.',
       messages:[{role:'user',content:prompt}]
     })
@@ -547,6 +632,7 @@ async function fetchArxiv(){
   const id=m[1].replace(/v\d+$/,'');
   const btn=document.getElementById('fetch-btn');
   btn.disabled=true;btn.textContent='Fetching...';setStatus('paper-status','');
+  currentS2Id=null;currentS2Field='';updatePreviewActions();
 
   // Worker URL — update this after deploying your Cloudflare Worker
   const WORKER_URL='https://arxiv-proxy.varshitaveda13.workers.dev';
@@ -570,6 +656,7 @@ async function fetchArxiv(){
     document.getElementById('prev-meta').textContent=(d.authors||'')+(d.year?' · '+d.year:'');
     document.getElementById('prev-abst').textContent=(d.abstract||'').slice(0,300);
     document.getElementById('preview').style.display='block';
+    resolveS2IdFromArxiv(id);
     setStatus('paper-status','Metadata fetched — review then save','ok');
   }catch(e){
     // Worker not yet deployed? Fall back to Anthropic API
@@ -598,6 +685,7 @@ async function fetchArxiv(){
       document.getElementById('prev-meta').textContent=(parsed.authors||'')+(parsed.year?' · '+parsed.year:'');
       document.getElementById('prev-abst').textContent=(parsed.abstract||'').slice(0,300);
       document.getElementById('preview').style.display='block';
+      resolveS2IdFromArxiv(id);
       setStatus('paper-status','Fetched via fallback — deploy Worker for better results','ok');
     }catch(e2){
       const msg=e2.message==='unknown'
@@ -616,17 +704,226 @@ async function savePaper(){
   const btn=document.getElementById('save-paper-btn');
   btn.disabled=true;setStatus('paper-status','Saving...');
   try{
-    await anthropic(`Create a new page in Notion database collection://12ce506c-f478-4d70-8431-c4833b3c7b46 with: Title="${title}", Authors="${document.getElementById('p-authors').value}", Year=${parseInt(document.getElementById('p-year').value)||'null'}, "DOI / URL"="${document.getElementById('p-url').value}", Source="${document.getElementById('p-source').value}", "Reading Status"="${document.getElementById('p-status').value}", Abstract="${document.getElementById('p-abstract').value.slice(0,500)}"`);
+    await anthropic(`Create a new page in Notion database collection://12ce506c-f478-4d70-8431-c4833b3c7b46 with: Title="${title}", Authors="${document.getElementById('p-authors').value}", Year=${parseInt(document.getElementById('p-year').value)||'null'}, "DOI / URL"="${document.getElementById('p-url').value}", Source="${document.getElementById('p-source').value}", "Reading Status"="${document.getElementById('p-status').value}", Abstract="${document.getElementById('p-abstract').value.slice(0,500)}", "S2 Paper ID"="${currentS2Id||''}", "Field of Study"="${currentS2Field||''}"`);
     setStatus('paper-status','Saved to Papers DB','ok');clearPaper();
-  }catch(e){setStatus('paper-status','Save failed — check API key in Settings','err')}
+  }catch(e){setStatus('paper-status','Save failed: '+(e.message||'check API key & Notion token in Settings'),'err')}
   finally{btn.disabled=false}
 }
 
 function clearPaper(){
   ['p-title','p-authors','p-year','p-url','p-abstract'].forEach(id=>document.getElementById(id).value='');
   document.getElementById('arxiv-input').value='';
+  document.getElementById('s2-query').value='';
+  document.getElementById('s2-results').style.display='none';
+  document.getElementById('related-results').style.display='none';
   document.getElementById('preview').style.display='none';
+  currentS2Id=null;currentS2Field='';
+  updatePreviewActions();
   setStatus('paper-status','');
+  setStatus('s2-status','');
+}
+
+// ════════════════════════════════
+//  SEMANTIC SCHOLAR (search + related papers)
+// ════════════════════════════════
+let currentS2Id=null, currentS2Field='';
+
+function updatePreviewActions(){
+  document.getElementById('preview-actions').style.display=currentS2Id?'block':'none';
+}
+
+function renderPickerList(container, papers, actions){
+  container.innerHTML='';
+  container.style.display='block';
+  if(!papers||papers.length===0){
+    const p=document.createElement('p');
+    p.style.cssText='font-size:12px;color:var(--text3);padding:10px 0';
+    p.textContent='No results';
+    container.appendChild(p);
+    return;
+  }
+  papers.forEach(paper=>{
+    const row=document.createElement('div');
+    row.className='picker-row';
+    const info=document.createElement('div');
+    info.className='picker-info';
+    const titleEl=document.createElement('div');
+    titleEl.className='picker-title';
+    titleEl.textContent=paper.title||'(untitled)';
+    const authors=(paper.authors||[]).map(a=>a.name).join(', ');
+    const metaEl=document.createElement('div');
+    metaEl.className='picker-meta';
+    metaEl.textContent=[authors,paper.year,paper.venue].filter(Boolean).join(' · ')||'—';
+    info.appendChild(titleEl);info.appendChild(metaEl);
+    const btnWrap=document.createElement('div');
+    btnWrap.className='picker-btns';
+    actions.forEach(a=>{
+      const btn=document.createElement('button');
+      btn.className='s-btn';
+      btn.textContent=a.label;
+      btn.onclick=()=>a.fn(paper);
+      btnWrap.appendChild(btn);
+    });
+    row.appendChild(info);row.appendChild(btnWrap);
+    container.appendChild(row);
+  });
+}
+
+async function searchSemanticScholar(){
+  const q=document.getElementById('s2-query').value.trim();
+  if(!q){setStatus('s2-status','Enter a search term','err');return}
+  const btn=document.getElementById('s2-search-btn');
+  btn.disabled=true;setStatus('s2-status','Searching...');
+  try{
+    const url=`https://api.semanticscholar.org/graph/v1/paper/search?query=${encodeURIComponent(q)}&limit=8&fields=title,authors,year,venue,externalIds,abstract,citationCount,paperId,s2FieldsOfStudy`;
+    const res=await fetch(url,{headers:s2Headers()});
+    if(!res.ok)throw new Error('http '+res.status);
+    const data=await res.json();
+    const papers=data.data||[];
+    renderPickerList(document.getElementById('s2-results'),papers,[{label:'Use this',fn:pickS2Paper}]);
+    setStatus('s2-status',papers.length?`${papers.length} result${papers.length!==1?'s':''}`:'No results found',papers.length?'ok':'');
+  }catch(e){
+    setStatus('s2-status','Semantic Scholar unavailable — try again shortly, or use arXiv ID / manual entry below','err');
+  }finally{btn.disabled=false}
+}
+
+function pickS2Paper(paper){
+  currentS2Id=paper.paperId||null;
+  currentS2Field=(paper.s2FieldsOfStudy&&paper.s2FieldsOfStudy[0]&&paper.s2FieldsOfStudy[0].category)||'';
+  const authors=(paper.authors||[]).map(a=>a.name).join(', ');
+  const arxivId=paper.externalIds&&paper.externalIds.ArXiv;
+  document.getElementById('p-title').value=paper.title||'';
+  document.getElementById('p-authors').value=authors;
+  document.getElementById('p-year').value=paper.year||'';
+  document.getElementById('p-url').value=arxivId?`https://arxiv.org/abs/${arxivId}`:(paper.url||'');
+  document.getElementById('p-abstract').value=(paper.abstract||'').slice(0,500);
+  document.getElementById('p-source').value=arxivId?'arXiv':'Semantic Scholar';
+  document.getElementById('prev-title').textContent=paper.title||'';
+  document.getElementById('prev-meta').textContent=authors+(paper.year?' · '+paper.year:'');
+  document.getElementById('prev-abst').textContent=(paper.abstract||'').slice(0,300);
+  document.getElementById('preview').style.display='block';
+  updatePreviewActions();
+  document.getElementById('related-results').style.display='none';
+  setStatus('paper-status','Loaded — review then save','ok');
+}
+
+function resolveS2IdFromArxiv(arxivId){
+  fetch(`https://api.semanticscholar.org/graph/v1/paper/arXiv:${arxivId}?fields=paperId,s2FieldsOfStudy`,{headers:s2Headers()})
+    .then(res=>res.ok?res.json():null)
+    .then(d=>{
+      if(d&&d.paperId){
+        currentS2Id=d.paperId;
+        currentS2Field=(d.s2FieldsOfStudy&&d.s2FieldsOfStudy[0]&&d.s2FieldsOfStudy[0].category)||'';
+        updatePreviewActions();
+      }
+    })
+    .catch(()=>{});
+}
+
+async function findRelated(){
+  if(!currentS2Id){setStatus('paper-status','No Semantic Scholar ID for this paper yet','err');return}
+  const btn=document.getElementById('find-related-btn');
+  btn.disabled=true;setStatus('paper-status','Finding related papers...');
+  try{
+    const fields='fields=title,year,authors,externalIds,paperId,s2FieldsOfStudy';
+    const [citRes,refRes]=await Promise.all([
+      fetch(`https://api.semanticscholar.org/graph/v1/paper/${currentS2Id}/citations?${fields}&limit=10`,{headers:s2Headers()}),
+      fetch(`https://api.semanticscholar.org/graph/v1/paper/${currentS2Id}/references?${fields}&limit=10`,{headers:s2Headers()})
+    ]);
+    if(!citRes.ok&&!refRes.ok)throw new Error('http');
+    const citData=citRes.ok?await citRes.json():{data:[]};
+    const refData=refRes.ok?await refRes.json():{data:[]};
+    const citing=(citData.data||[]).map(x=>x.citingPaper).filter(p=>p&&p.title).map(p=>Object.assign({},p,{__dir:'citing'}));
+    const cited=(refData.data||[]).map(x=>x.citedPaper).filter(p=>p&&p.title).map(p=>Object.assign({},p,{__dir:'cited'}));
+    const all=citing.concat(cited);
+    renderPickerList(document.getElementById('related-results'),all,[
+      {label:'Add as paper',fn:pickS2Paper},
+      {label:'Add as connection',fn:addAsConnection}
+    ]);
+    setStatus('paper-status',all.length?`${all.length} related paper${all.length!==1?'s':''} found`:'No related papers found','ok');
+  }catch(e){
+    setStatus('paper-status','Semantic Scholar unavailable — try again shortly','err');
+  }finally{btn.disabled=false}
+}
+
+function addAsConnection(paper){
+  const currentTitle=document.getElementById('p-title').value.trim();
+  if(!currentTitle){setStatus('paper-status','Load the current paper\'s title first','err');return}
+  if(paper.__dir==='citing'){
+    document.getElementById('c-a').value=paper.title;
+    document.getElementById('c-b').value=currentTitle;
+  }else{
+    document.getElementById('c-a').value=currentTitle;
+    document.getElementById('c-b').value=paper.title;
+  }
+  document.querySelectorAll('#conn-types .ct-opt').forEach(el=>{
+    if(el.textContent.trim()==='cites')toggleCT(el);
+  });
+  switchTab('conn', null, true);
+}
+
+// ════════════════════════════════
+//  ZOTERO
+// ════════════════════════════════
+function mapToZoteroItem(){
+  const source=document.getElementById('p-source').value;
+  const title=document.getElementById('p-title').value.trim();
+  const authorsRaw=document.getElementById('p-authors').value;
+  const year=document.getElementById('p-year').value.trim();
+  const url=document.getElementById('p-url').value.trim();
+  const abstract=document.getElementById('p-abstract').value;
+
+  const creators=authorsRaw.split(',').map(s=>s.trim()).filter(Boolean).map(name=>{
+    const parts=name.split(' ');
+    const lastName=parts.pop()||name;
+    const firstName=parts.join(' ');
+    return {creatorType:'author',firstName,lastName};
+  });
+
+  let itemType='document';
+  if(source==='arXiv')itemType='preprint';
+  else if(source==='PubMed'||source==='Google Scholar'||source==='Semantic Scholar')itemType='journalArticle';
+
+  const item={itemType,title,creators,abstractNote:abstract,date:year,url};
+
+  if(itemType==='preprint'){
+    item.repository='arXiv';
+    const m=url.match(/(\d{4}\.\d{4,5})/);
+    if(m)item.archiveID='arXiv:'+m[1];
+  }
+  if(/^10\.\d{4,9}\//.test(url))item.DOI=url;
+
+  return item;
+}
+
+async function sendToZotero(){
+  const title=document.getElementById('p-title').value.trim();
+  if(!title){setStatus('paper-status','Title is required','err');return}
+  if(!zoteroUserId()||!zoteroKey()){setStatus('paper-status','Set Zotero User ID & API key in Settings first','err');return}
+  const btn=document.getElementById('send-zotero-btn');
+  btn.disabled=true;setStatus('paper-status','Sending to Zotero...');
+  try{
+    const res=await fetch(`https://api.zotero.org/users/${zoteroUserId()}/items`,{
+      method:'POST',
+      headers:{'Content-Type':'application/json','Zotero-API-Key':zoteroKey()},
+      body:JSON.stringify([mapToZoteroItem()])
+    });
+    if(res.status===403){setStatus('paper-status','Zotero rejected the request — check your API key has write access','err');return}
+    if(!res.ok){setStatus('paper-status','Zotero error: http '+res.status,'err');return}
+    const data=await res.json();
+    const failedKeys=data.failed?Object.keys(data.failed):[];
+    const successKeys=data.success?Object.keys(data.success):(data.successful?Object.keys(data.successful):[]);
+    if(failedKeys.length){
+      const msg=(data.failed[failedKeys[0]]&&data.failed[failedKeys[0]].message)||'unknown error';
+      setStatus('paper-status','Zotero rejected the item: '+msg,'err');
+    }else if(successKeys.length){
+      setStatus('paper-status','Sent to Zotero','ok');
+    }else{
+      setStatus('paper-status','Zotero: unexpected response — check your library','err');
+    }
+  }catch(e){
+    setStatus('paper-status','Zotero unavailable — try again shortly','err');
+  }finally{btn.disabled=false}
 }
 
 // ════════════════════════════════
@@ -641,7 +938,7 @@ async function saveNote(){
     const tags=getTags();
     await anthropic(`Create a new page in Notion database collection://c227422f-28eb-4dfb-bfb8-bc3672aad457 with: "Note Title"="${title}", "Note Type"="${document.getElementById('n-type').value}", Confidence="${document.getElementById('n-conf').value}", "Related Papers"="${document.getElementById('n-papers').value}", "Key Insight"="${document.getElementById('n-insight').value}", Body="${document.getElementById('n-body').value.slice(0,800)}", Tags=${JSON.stringify(tags)}`);
     setStatus('note-status','Saved to Notes DB','ok');clearNote();
-  }catch(e){setStatus('note-status','Save failed — check API key in Settings','err')}
+  }catch(e){setStatus('note-status','Save failed: '+(e.message||'check API key & Notion token in Settings'),'err')}
   finally{btn.disabled=false}
 }
 
@@ -664,7 +961,7 @@ async function saveConnection(){
     const ct=getCT();
     await anthropic(`Create a new page in Notion database collection://2c8b4704-42bd-4f45-afce-0f884be4ce99 with: Connection="${a} → ${b}", "Paper A"="${a}", "Paper B"="${b}", "Connection Type"="${ct}", Strength="${document.getElementById('c-strength').value}", Notes="${document.getElementById('c-notes').value}"`);
     setStatus('conn-status','Saved to Connections DB','ok');clearConn();
-  }catch(e){setStatus('conn-status','Save failed — check API key in Settings','err')}
+  }catch(e){setStatus('conn-status','Save failed: '+(e.message||'check API key & Notion token in Settings'),'err')}
   finally{btn.disabled=false}
 }
 
@@ -729,7 +1026,7 @@ async function syncGraph(){
   try{
     const body={
       model:'claude-sonnet-4-20250514',max_tokens:1000,
-      mcp_servers:[{type:'url',url:'https://mcp.notion.com/mcp',name:'notion'}],
+      mcp_servers:[{type:'url',url:'https://mcp.notion.com/mcp',name:'notion',authorization_token:notionToken()}],
       system:'You are a data retrieval assistant. Return ONLY valid JSON array, no markdown, no explanation, no backticks.',
       messages:[{role:'user',content:'Fetch all pages from Notion database collection://2c8b4704-42bd-4f45-afce-0f884be4ce99. Return a JSON array where each item has keys: paperA (Paper A field), paperB (Paper B field), connectionType (Connection Type field), strength (Strength field), notes (Notes field). Return [] if empty.'}]
     };
