@@ -601,6 +601,12 @@ function apiKey(){return localStorage.getItem('rh_key')||''}
 function notionToken(){return localStorage.getItem('rh_notion')||''}
 function s2Key(){return localStorage.getItem('rh_s2key')||''}
 function s2Headers(){return s2Key()?{'x-api-key':s2Key()}:{}}
+function s2ErrorReason(status){
+  if(status===429)return 'rate limited (http 429)'+(s2Key()?' — your API key may not be active yet':' — try adding an API key in Settings to raise the limit');
+  if(status===403)return 'key rejected (http 403) — check the key in Settings, or it may still be activating';
+  if(status)return 'http '+status;
+  return 'network error';
+}
 function zoteroUserId(){return localStorage.getItem('rh_zot_uid')||''}
 function zoteroKey(){return localStorage.getItem('rh_zot_key')||''}
 
@@ -777,13 +783,13 @@ async function searchSemanticScholar(){
   try{
     const url=`https://api.semanticscholar.org/graph/v1/paper/search?query=${encodeURIComponent(q)}&limit=8&fields=title,authors,year,venue,externalIds,abstract,citationCount,paperId,s2FieldsOfStudy`;
     const res=await fetch(url,{headers:s2Headers()});
-    if(!res.ok)throw new Error('http '+res.status);
+    if(!res.ok)throw new Error(s2ErrorReason(res.status));
     const data=await res.json();
     const papers=data.data||[];
     renderPickerList(document.getElementById('s2-results'),papers,[{label:'Use this',fn:pickS2Paper}]);
     setStatus('s2-status',papers.length?`${papers.length} result${papers.length!==1?'s':''}`:'No results found',papers.length?'ok':'');
   }catch(e){
-    setStatus('s2-status','Semantic Scholar unavailable — try again shortly, or use arXiv ID / manual entry below','err');
+    setStatus('s2-status','Semantic Scholar: '+(e.message||'unavailable, try again shortly')+' — or use arXiv ID / manual entry below','err');
   }finally{btn.disabled=false}
 }
 
@@ -830,7 +836,7 @@ async function findRelated(){
       fetch(`https://api.semanticscholar.org/graph/v1/paper/${currentS2Id}/citations?${fields}&limit=10`,{headers:s2Headers()}),
       fetch(`https://api.semanticscholar.org/graph/v1/paper/${currentS2Id}/references?${fields}&limit=10`,{headers:s2Headers()})
     ]);
-    if(!citRes.ok&&!refRes.ok)throw new Error('http');
+    if(!citRes.ok&&!refRes.ok)throw new Error(s2ErrorReason(citRes.status));
     const citData=citRes.ok?await citRes.json():{data:[]};
     const refData=refRes.ok?await refRes.json():{data:[]};
     const citing=(citData.data||[]).map(x=>x.citingPaper).filter(p=>p&&p.title).map(p=>Object.assign({},p,{__dir:'citing'}));
@@ -842,7 +848,7 @@ async function findRelated(){
     ]);
     setStatus('paper-status',all.length?`${all.length} related paper${all.length!==1?'s':''} found`:'No related papers found','ok');
   }catch(e){
-    setStatus('paper-status','Semantic Scholar unavailable — try again shortly','err');
+    setStatus('paper-status','Semantic Scholar: '+(e.message||'unavailable, try again shortly'),'err');
   }finally{btn.disabled=false}
 }
 
