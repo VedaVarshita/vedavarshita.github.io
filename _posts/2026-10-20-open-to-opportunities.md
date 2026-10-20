@@ -2,6 +2,7 @@
 title: "Open to Opportunities"
 date: 2026-10-20
 pin: true
+description: "ML researcher and engineer — neural network initialization, LLM alignment (DPO/RLHF), agentic retrieval + knowledge-graph systems. Currently at BioNTech. Open to full-time Applied AI / ML Research roles."
 ---
 
 I'm a machine learning researcher and engineer working on neural network initialization, LLM alignment (DPO/RLHF), and agentic retrieval + knowledge-graph systems — currently a Gen AI Researcher at BioNTech. Open to full-time Applied AI / ML Research roles.
